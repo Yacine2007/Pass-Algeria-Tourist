@@ -1,0 +1,2819 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Partner Dashboard | لوحة الشريك السياحي</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== CSS: لوحة الشريك السياحي المحسنة ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        :root {
+            --primary: #1a9c9c;
+            --secondary: #d4af37;
+            --dark: #1a3c3c;
+            --light: #f8f9fa;
+            --partner-blue: #3498db;
+            --partner-light: #e3f2fd;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --purple: #6f42c1;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --sidebar-width: 280px;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* ===== الهيدر الثابت ===== */
+        .main-header {
+            background-color: var(--primary);
+            height: 100px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* ===== الشريط الذهبي المتموج ===== */
+        .gold-wave-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35px;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .gold-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: calc(100% + 1.3px);
+            height: 35px;
+        }
+        
+        .gold-wave svg {
+            position: absolute;
+            bottom: 1px;
+            left: 0;
+            width: calc(100% + 1.3px);
+            height: 35px;
+            display: block;
+        }
+        
+        .gold-wave .wave-shadow {
+            fill: none;
+            stroke: rgba(0, 0, 0, 0.1);
+            stroke-width: 5;
+        }
+        
+        .gold-wave .wave-path {
+            fill: none;
+            stroke: var(--secondary);
+            stroke-width: 20;
+        }
+        
+        /* ===== الشعار على اليمين ===== */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: flex-end;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo-text {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+            background-color: rgba(26, 60, 60, 0.3);
+            padding: 5px 15px;
+            border-radius: 8px;
+        }
+        
+        .logo-pass {
+            color: var(--secondary);
+            font-size: 1.8rem;
+            font-weight: 900;
+        }
+        
+        .logo-main {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        /* ===== عناصر التحكم على اليسار ===== */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ===== قائمة اللغة المنسدلة ===== */
+        .language-dropdown {
+            position: relative;
+        }
+        
+        .current-flag {
+            width: 42px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border: 2px solid white;
+        }
+        
+        .current-flag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .flag-ar {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Flag_of_Algeria.svg/800px-Flag_of_Algeria.svg.png');
+        }
+        
+        .flag-fr {
+            background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Flag_of_France.svg/800px-Flag_of_France.svg.png');
+        }
+        
+        .flag-en {
+            background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Flag_of_the_United_Kingdom.svg/800px-Flag_of_the_United_Kingdom.svg.png');
+        }
+        
+        .language-options {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-hover);
+            min-width: 60px;
+            display: none;
+            z-index: 1002;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .language-options.show {
+            display: block;
+            animation: dropdownAppear 0.2s ease-out;
+        }
+        
+        .language-option {
+            width: 42px;
+            height: 32px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .language-option:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+        
+        @keyframes dropdownAppear {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== أيقونة الحساب ===== */
+        .user-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: white;
+            color: var(--partner-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--partner-blue);
+        }
+        
+        .user-icon:hover {
+            background-color: var(--partner-blue);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        /* ===== زر القائمة الجانبية ===== */
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .menu-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        /* ===== القائمة الجانبية ===== */
+        .sidebar {
+            position: fixed;
+            top: 100px;
+            right: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - 100px);
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(100%);
+        }
+        
+        .sidebar-header {
+            padding: 25px;
+            background: linear-gradient(135deg, var(--partner-blue) 0%, #2980b9 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .sidebar-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            color: var(--partner-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .sidebar-user h4 {
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-user p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-item {
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-right: 4px solid transparent;
+            color: var(--dark);
+            text-decoration: none;
+        }
+        
+        .sidebar-item:hover {
+            background-color: var(--light);
+            border-right-color: var(--partner-blue);
+        }
+        
+        .sidebar-item.active {
+            background-color: var(--partner-light);
+            border-right-color: var(--partner-blue);
+            color: var(--partner-blue);
+        }
+        
+        .sidebar-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-item .badge {
+            margin-right: auto;
+            background-color: var(--partner-blue);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* ===== المحتوى الرئيسي مع القائمة الجانبية ===== */
+        .main-content {
+            margin-top: 100px;
+            padding: 30px 20px;
+            transition: margin-right 0.3s ease;
+        }
+        
+        .main-content.with-sidebar {
+            margin-right: var(--sidebar-width);
+        }
+        
+        /* ===== أقسام المحتوى ===== */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== لوحة معلومات الشريك ===== */
+        .partner-info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            border-top: 5px solid var(--partner-blue);
+        }
+        
+        .partner-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--partner-blue) 0%, #2980b9 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            border: 5px solid var(--light);
+            box-shadow: var(--shadow);
+        }
+        
+        .partner-details {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .partner-details h2 {
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .partner-details .partner-type {
+            display: inline-block;
+            background-color: var(--partner-light);
+            color: var(--partner-blue);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .partner-stats {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .partner-stat {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .partner-stat .label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .partner-stat .value {
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .partner-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .status-active {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success);
+        }
+        
+        /* ===== الإحصائيات السريعة ===== */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            border-top: 5px solid var(--partner-blue);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .icon-transactions {
+            background: linear-gradient(135deg, var(--partner-blue) 0%, #2980b9 100%);
+        }
+        
+        .icon-revenue {
+            background: linear-gradient(135deg, var(--success) 0%, #1e7e34 100%);
+        }
+        
+        .icon-monthly {
+            background: linear-gradient(135deg, var(--secondary) 0%, #b6951d 100%);
+        }
+        
+        .icon-average {
+            background: linear-gradient(135deg, var(--purple) 0%, #4a2d8c 100%);
+        }
+        
+        .stat-change {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 15px;
+        }
+        
+        .change-up {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success);
+        }
+        
+        .change-down {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--danger);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        /* ===== قسم إضافة معاملة ===== */
+        .add-transaction-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            border: 2px dashed var(--partner-light);
+        }
+        
+        .section-title {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .section-title h2 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .transaction-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            align-items: end;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #fff;
+        }
+        
+        .form-control:focus {
+            border-color: var(--partner-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .input-with-icon .form-control {
+            padding-right: 18px;
+            padding-left: 45px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--partner-blue) 0%, #2980b9 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #1e7e34 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+        
+        .qr-display {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: none;
+        }
+        
+        .qr-display.show {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--dark);
+        }
+        
+        .transaction-details {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-light);
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        /* ===== سجل المعاملات الحديثة ===== */
+        .recent-transactions {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+        
+        .transactions-table-container {
+            overflow-x: auto;
+        }
+        
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .transactions-table th {
+            background-color: var(--light);
+            color: var(--dark);
+            font-weight: 600;
+            text-align: right;
+            padding: 15px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        
+        .transactions-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+            color: var(--gray);
+        }
+        
+        .transactions-table tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .transaction-id {
+            color: var(--partner-blue);
+            font-weight: 600;
+            font-family: monospace;
+        }
+        
+        .transaction-amount {
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .status-badge-sm {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #b6951d;
+        }
+        
+        .status-cancelled {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--danger);
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .table-action-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.3s;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .table-action-btn:hover {
+            background-color: var(--light);
+            color: var(--partner-blue);
+        }
+        
+        /* ===== الإحصائيات التفصيلية مع رسوم بيانية ===== */
+        .detailed-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+        
+        .chart-canvas {
+            width: 100% !important;
+            height: 300px !important;
+        }
+        
+        .time-filter {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            background: none;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn.active {
+            background-color: var(--partner-blue);
+            color: white;
+            border-color: var(--partner-blue);
+        }
+        
+        /* ===== قسم التقارير ===== */
+        .reports-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .report-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--partner-blue);
+        }
+        
+        .report-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--partner-blue) 0%, #2980b9 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 20px;
+        }
+        
+        .report-card h4 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .report-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        /* ===== قسم الإعدادات ===== */
+        .settings-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+        
+        .settings-form {
+            max-width: 600px;
+            margin-top: 25px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        /* ===== معلومات الاتصال والدعم ===== */
+        .support-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+        
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .support-card {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .support-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .support-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--partner-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 20px;
+        }
+        
+        .support-card h4 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .support-card p {
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .support-card a {
+            color: var(--partner-blue);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .support-card a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ===== الفوتر ===== */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 40px 20px 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .footer-logo h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .footer-links h4 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary);
+            transform: translateX(-5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            color: #aaa;
+            font-size: 0.9rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* ===== نظام اللغات ===== */
+        body[data-lang="fr"] .lang-ar,
+        body[data-lang="en"] .lang-ar {
+            display: none !important;
+        }
+        
+        body[data-lang="ar"] .lang-fr,
+        body[data-lang="ar"] .lang-en,
+        body[data-lang="fr"] .lang-en,
+        body[data-lang="en"] .lang-fr {
+            display: none !important;
+        }
+        
+        /* ===== وسائط متجاوبة ===== */
+        @media (max-width: 1200px) {
+            .logo-text {
+                font-size: 1.6rem;
+            }
+            
+            .logo-pass, .logo-main {
+                font-size: 1.6rem;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .main-header {
+                padding: 0 20px;
+                height: 90px;
+            }
+            
+            .sidebar {
+                top: 90px;
+                height: calc(100vh - 90px);
+            }
+            
+            .main-content {
+                margin-top: 90px;
+            }
+            
+            .main-content.with-sidebar {
+                margin-right: 0;
+            }
+            
+            .sidebar {
+                transform: translateX(100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .partner-info-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .partner-stats {
+                justify-content: center;
+            }
+            
+            .transaction-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .detailed-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-header {
+                padding: 0 15px;
+                height: 85px;
+            }
+            
+            .sidebar {
+                top: 85px;
+                height: calc(100vh - 85px);
+            }
+            
+            .main-content {
+                margin-top: 85px;
+                padding: 20px 15px;
+            }
+            
+            .logo-text {
+                font-size: 1.4rem;
+            }
+            
+            .logo-pass, .logo-main {
+                font-size: 1.4rem;
+            }
+            
+            .header-controls {
+                gap: 12px;
+            }
+            
+            .current-flag {
+                width: 38px;
+                height: 28px;
+            }
+            
+            .user-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 1.1rem;
+            }
+            
+            .quick-stats {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 20px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-value {
+                font-size: 1.8rem;
+            }
+            
+            .transactions-table {
+                font-size: 0.9rem;
+            }
+            
+            .transactions-table th,
+            .transactions-table td {
+                padding: 10px;
+            }
+            
+            .chart-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .time-filter {
+                align-self: flex-end;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-header {
+                padding: 0 10px;
+                height: 80px;
+            }
+            
+            .sidebar {
+                top: 80px;
+                height: calc(100vh - 80px);
+                width: 100%;
+            }
+            
+            .main-content {
+                margin-top: 80px;
+                padding: 15px 10px;
+            }
+            
+            .section-title h2 {
+                font-size: 1.5rem;
+            }
+            
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .partner-details {
+                min-width: 100%;
+            }
+            
+            .partner-stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .support-grid, .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .time-filter {
+                flex-wrap: wrap;
+            }
+            
+            .filter-btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 1.2rem;
+            }
+            
+            .logo-pass, .logo-main {
+                font-size: 1.2rem;
+            }
+            
+            .header-controls {
+                gap: 8px;
+            }
+            
+            .current-flag {
+                width: 34px;
+                height: 25px;
+            }
+            
+            .user-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+            
+            .menu-btn {
+                font-size: 1.3rem;
+                padding: 8px;
+            }
+            
+            .sidebar-header {
+                padding: 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        /* تحسينات للحواسيب اللمسية */
+        @media (hover: none) and (pointer: coarse) {
+            .stat-card:hover, .support-card:hover, .table-action-btn:hover,
+            .report-card:hover, .sidebar-item:hover {
+                transform: none;
+            }
+            
+            .stat-card:active, .support-card:active, .report-card:active {
+                opacity: 0.9;
+                transform: scale(0.98);
+            }
+            
+            .btn-primary:active, .btn-success:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body data-lang="ar">
+    <!-- الهيدر الثابت -->
+    <header class="main-header">
+        <!-- الشريط الذهبي المتموج في المنتصف -->
+        <div class="gold-wave-container">
+            <div class="gold-wave">
+                <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+                    <path d="M0,80 C150,150 350,0 500,80" class="wave-shadow"></path>
+                    <path d="M0,80 C150,150 350,0 500,80" class="wave-path"></path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- عناصر التحكم على اليسار -->
+        <div class="header-controls">
+            <!-- قائمة اللغة المنسدلة -->
+            <div class="language-dropdown">
+                <div class="current-flag flag-ar" id="currentFlag" title="العربية"></div>
+                <div class="language-options" id="languageOptions">
+                    <div class="language-option flag-ar" data-lang="ar" title="العربية"></div>
+                    <div class="language-option flag-fr" data-lang="fr" title="Français"></div>
+                    <div class="language-option flag-en" data-lang="en" title="English"></div>
+                </div>
+            </div>
+            
+            <!-- أيقونة الحساب -->
+            <div class="user-icon" id="userIcon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            
+            <!-- زر القائمة الجانبية -->
+            <button class="menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- الشعار على اليمين -->
+        <div class="logo-container">
+            <div class="logo-text">
+                <span class="logo-pass">Pass</span>
+                <span class="logo-main">Algeria Tourist</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- القائمة الجانبية -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">
+                <i class="fas fa-hotel"></i>
+            </div>
+            <div class="sidebar-user">
+                <h4 class="lang-ar">فندق الجزائر الدولي</h4>
+                <h4 class="lang-fr">Hôtel International d'Alger</h4>
+                <h4 class="lang-en">Algiers International Hotel</h4>
+                <p class="lang-ar">شريك معتمد</p>
+                <p class="lang-fr">Partenaire certifié</p>
+                <p class="lang-en">Certified Partner</p>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="#" class="sidebar-item active" data-section="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span class="lang-ar">لوحة التحكم</span>
+                <span class="lang-fr">Tableau de bord</span>
+                <span class="lang-en">Dashboard</span>
+            </a>
+            
+            <a href="#" class="sidebar-item" data-section="transactions">
+                <i class="fas fa-exchange-alt"></i>
+                <span class="lang-ar">إضافة معاملة</span>
+                <span class="lang-fr">Ajouter transaction</span>
+                <span class="lang-en">Add Transaction</span>
+                <span class="badge">جديد</span>
+            </a>
+            
+            <a href="#" class="sidebar-item" data-section="history">
+                <i class="fas fa-history"></i>
+                <span class="lang-ar">سجل المعاملات</span>
+                <span class="lang-fr">Historique</span>
+                <span class="lang-en">History</span>
+            </a>
+            
+            <a href="#" class="sidebar-item" data-section="statistics">
+                <i class="fas fa-chart-bar"></i>
+                <span class="lang-ar">الإحصائيات</span>
+                <span class="lang-fr">Statistiques</span>
+                <span class="lang-en">Statistics</span>
+            </a>
+            
+            <a href="#" class="sidebar-item" data-section="reports">
+                <i class="fas fa-file-alt"></i>
+                <span class="lang-ar">التقارير</span>
+                <span class="lang-fr">Rapports</span>
+                <span class="lang-en">Reports</span>
+            </a>
+            
+            <a href="#" class="sidebar-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span class="lang-ar">الإعدادات</span>
+                <span class="lang-fr">Paramètres</span>
+                <span class="lang-en">Settings</span>
+            </a>
+            
+            <a href="#" class="sidebar-item" data-section="support">
+                <i class="fas fa-headset"></i>
+                <span class="lang-ar">الدعم</span>
+                <span class="lang-fr">Support</span>
+                <span class="lang-en">Support</span>
+            </a>
+            
+            <div class="sidebar-item" id="sidebarLogout" style="color: var(--danger);">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="lang-ar">تسجيل الخروج</span>
+                <span class="lang-fr">Déconnexion</span>
+                <span class="lang-en">Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content" id="mainContent">
+        <!-- قسم لوحة التحكم -->
+        <section id="dashboard" class="content-section active">
+            <!-- معلومات الشريك -->
+            <div class="partner-info-card">
+                <div class="partner-avatar">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                
+                <div class="partner-details">
+                    <h2 class="lang-ar">فندق الجزائر الدولي</h2>
+                    <h2 class="lang-fr">Hôtel International d'Alger</h2>
+                    <h2 class="lang-en">Algiers International Hotel</h2>
+                    
+                    <span class="partner-type">
+                        <span class="lang-ar">فندق 5 نجوم</span>
+                        <span class="lang-fr">Hôtel 5 étoiles</span>
+                        <span class="lang-en">5 Star Hotel</span>
+                    </span>
+                    
+                    <div class="partner-stats">
+                        <div class="partner-stat">
+                            <span class="label lang-ar">رقم الشريك</span>
+                            <span class="label lang-fr">Numéro partenaire</span>
+                            <span class="label lang-en">Partner Number</span>
+                            <span class="value">PA-7892</span>
+                        </div>
+                        
+                        <div class="partner-stat">
+                            <span class="label lang-ar">تاريخ التسجيل</span>
+                            <span class="label lang-fr">Date d'inscription</span>
+                            <span class="label lang-en">Registration Date</span>
+                            <span class="value">15/03/2024</span>
+                        </div>
+                        
+                        <div class="partner-stat">
+                            <span class="label lang-ar">عدد المعاملات</span>
+                            <span class="label lang-fr">Nombre de transactions</span>
+                            <span class="label lang-en">Transactions Count</span>
+                            <span class="value">1,247</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="partner-status">
+                    <span class="status-badge status-active">
+                        <i class="fas fa-circle"></i>
+                        <span class="lang-ar">نشط</span>
+                        <span class="lang-fr">Actif</span>
+                        <span class="lang-en">Active</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- إحصائيات سريعة -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-transactions">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <span class="stat-change change-up">
+                            <i class="fas fa-arrow-up"></i> 12%
+                        </span>
+                    </div>
+                    <div class="stat-value">47</div>
+                    <div class="stat-label lang-ar">معاملة اليوم</div>
+                    <div class="stat-label lang-fr">Transactions aujourd'hui</div>
+                    <div class="stat-label lang-en">Today's Transactions</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-revenue">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <span class="stat-change change-up">
+                            <i class="fas fa-arrow-up"></i> 18%
+                        </span>
+                    </div>
+                    <div class="stat-value">245,800 <small>دج</small></div>
+                    <div class="stat-label lang-ar">إيرادات اليوم</div>
+                    <div class="stat-label lang-fr">Revenus aujourd'hui</div>
+                    <div class="stat-label lang-en">Today's Revenue</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-monthly">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <span class="stat-change change-down">
+                            <i class="fas fa-arrow-down"></i> 3%
+                        </span>
+                    </div>
+                    <div class="stat-value">892</div>
+                    <div class="stat-label lang-ar">معاملة هذا الشهر</div>
+                    <div class="stat-label lang-fr">Transactions ce mois</div>
+                    <div class="stat-label lang-en">Monthly Transactions</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon icon-average">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="stat-change change-up">
+                            <i class="fas fa-arrow-up"></i> 7%
+                        </span>
+                    </div>
+                    <div class="stat-value">5,230 <small>دج</small></div>
+                    <div class="stat-label lang-ar">متوسط قيمة المعاملة</div>
+                    <div class="stat-label lang-fr">Valeur moyenne par transaction</div>
+                    <div class="stat-label lang-en">Average Transaction Value</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم إضافة معاملة -->
+        <section id="transactions" class="content-section">
+            <div class="add-transaction-section">
+                <div class="section-title">
+                    <h2>
+                        <i class="fas fa-qrcode"></i>
+                        <span class="lang-ar">إضافة معاملة جديدة</span>
+                        <span class="lang-fr">Ajouter une nouvelle transaction</span>
+                        <span class="lang-en">Add New Transaction</span>
+                    </h2>
+                </div>
+                
+                <form id="transactionForm" class="transaction-form">
+                    <div class="form-group">
+                        <label for="amount" class="lang-ar">المبلغ (دينار جزائري)</label>
+                        <label for="amount" class="lang-fr">Montant (Dinar algérien)</label>
+                        <label for="amount" class="lang-en">Amount (Algerian Dinar)</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-money-bill"></i>
+                            <input type="number" id="amount" class="form-control" placeholder="5000" min="100" step="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceType" class="lang-ar">نوع الخدمة</label>
+                        <label for="serviceType" class="lang-fr">Type de service</label>
+                        <label for="serviceType" class="lang-en">Service Type</label>
+                        <select id="serviceType" class="form-control">
+                            <option value="hotel" class="lang-ar">إقامة فندقية</option>
+                            <option value="hotel" class="lang-fr">Hébergement hôtelier</option>
+                            <option value="hotel" class="lang-en">Hotel Accommodation</option>
+                            
+                            <option value="restaurant" class="lang-ar">مطعم</option>
+                            <option value="restaurant" class="lang-fr">Restaurant</option>
+                            <option value="restaurant" class="lang-en">Restaurant</option>
+                            
+                            <option value="transport" class="lang-ar">نقل</option>
+                            <option value="transport" class="lang-fr">Transport</option>
+                            <option value="transport" class="lang-en">Transport</option>
+                            
+                            <option value="museum" class="lang-ar">متحف/موقع أثري</option>
+                            <option value="museum" class="lang-fr">Musée/Site archéologique</option>
+                            <option value="museum" class="lang-en">Museum/Archaeological Site</option>
+                            
+                            <option value="activity" class="lang-ar">نشاط سياحي</option>
+                            <option value="activity" class="lang-fr">Activité touristique</option>
+                            <option value="activity" class="lang-en">Tourist Activity</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description" class="lang-ar">وصف إضافي (اختياري)</label>
+                        <label for="description" class="lang-fr">Description supplémentaire (optionnel)</label>
+                        <label for="description" class="lang-en">Additional Description (Optional)</label>
+                        <textarea id="description" class="form-control" rows="2" placeholder="..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" style="height: 48px;">
+                            <i class="fas fa-plus-circle"></i>
+                            <span class="lang-ar">إضافة المعاملة وعرض QR Code</span>
+                            <span class="lang-fr">Ajouter et afficher QR Code</span>
+                            <span class="lang-en">Add Transaction & Show QR Code</span>
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="qrDisplay" class="qr-display">
+                    <div class="qr-code" id="qrCode">
+                        <!-- سيتم عرض QR Code هنا -->
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    
+                    <h4 class="lang-ar">اطلب من السائح مسح الـ QR Code</h4>
+                    <h4 class="lang-fr">Demandez au touriste de scanner le QR Code</h4>
+                    <h4 class="lang-en">Ask the tourist to scan the QR Code</h4>
+                    
+                    <p class="lang-ar">استخدم تطبيق Algeria Tourist Pass على هاتف السائح لمسح الرمز</p>
+                    <p class="lang-fr">Utilisez l'application Algeria Tourist Pass sur le téléphone du touriste pour scanner le code</p>
+                    <p class="lang-en">Use the Algeria Tourist Pass app on the tourist's phone to scan the code</p>
+                    
+                    <div class="transaction-details">
+                        <div class="detail-item">
+                            <span class="lang-ar">رقم المعاملة:</span>
+                            <span class="lang-fr">Numéro de transaction:</span>
+                            <span class="lang-en">Transaction Number:</span>
+                            <strong id="transactionId">TXN-789456</strong>
+                        </div>
+                        <div class="detail-item">
+                            <span class="lang-ar">المبلغ:</span>
+                            <span class="lang-fr">Montant:</span>
+                            <span class="lang-en">Amount:</span>
+                            <strong id="transactionAmount">5,000 دج</strong>
+                        </div>
+                        <div class="detail-item">
+                            <span class="lang-ar">التاريخ والوقت:</span>
+                            <span class="lang-fr">Date et heure:</span>
+                            <span class="lang-en">Date & Time:</span>
+                            <strong id="transactionTime">15/04/2024 14:30</strong>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-success" id="confirmTransaction" style="margin-top: 20px;">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="lang-ar">تأكيد اتمام الدفع</span>
+                        <span class="lang-fr">Confirmer le paiement</span>
+                        <span class="lang-en">Confirm Payment Completion</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم سجل المعاملات -->
+        <section id="history" class="content-section">
+            <div class="recent-transactions">
+                <div class="section-title">
+                    <h2>
+                        <i class="fas fa-history"></i>
+                        <span class="lang-ar">سجل المعاملات الحديثة</span>
+                        <span class="lang-fr">Historique des transactions récentes</span>
+                        <span class="lang-en">Recent Transactions History</span>
+                    </h2>
+                </div>
+                
+                <div class="transactions-table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th class="lang-ar">رقم المعاملة</th>
+                                <th class="lang-fr">Numéro de transaction</th>
+                                <th class="lang-en">Transaction Number</th>
+                                
+                                <th class="lang-ar">التاريخ والوقت</th>
+                                <th class="lang-fr">Date et heure</th>
+                                <th class="lang-en">Date & Time</th>
+                                
+                                <th class="lang-ar">المبلغ</th>
+                                <th class="lang-fr">Montant</th>
+                                <th class="lang-en">Amount</th>
+                                
+                                <th class="lang-ar">رقم بطاقة السائح</th>
+                                <th class="lang-fr">Numéro de carte touriste</th>
+                                <th class="lang-en">Tourist Card Number</th>
+                                
+                                <th class="lang-ar">الحالة</th>
+                                <th class="lang-fr">Statut</th>
+                                <th class="lang-en">Status</th>
+                                
+                                <th class="lang-ar">الإجراءات</th>
+                                <th class="lang-fr">Actions</th>
+                                <th class="lang-en">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- البيانات ستُضاف عبر JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الإحصائيات -->
+        <section id="statistics" class="content-section">
+            <div class="detailed-stats">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="lang-ar">المعاملات حسب اليوم (آخر 7 أيام)</h3>
+                        <h3 class="lang-fr">Transactions par jour (7 derniers jours)</h3>
+                        <h3 class="lang-en">Transactions by Day (Last 7 Days)</h3>
+                        
+                        <div class="time-filter">
+                            <button class="filter-btn active" data-period="7">7 أيام</button>
+                            <button class="filter-btn" data-period="30">30 يوم</button>
+                            <button class="filter-btn" data-period="90">3 أشهر</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-placeholder">
+                        <canvas id="transactionsChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="lang-ar">الإيرادات حسب نوع الخدمة</h3>
+                        <h3 class="lang-fr">Revenus par type de service</h3>
+                        <h3 class="lang-en">Revenue by Service Type</h3>
+                    </div>
+                    
+                    <div class="chart-placeholder">
+                        <canvas id="revenueChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detailed-stats">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="lang-ar">أعلى فترات النشاط اليومي</h3>
+                        <h3 class="lang-fr">Périodes d'activité quotidiennes les plus élevées</h3>
+                        <h3 class="lang-en">Daily Peak Activity Periods</h3>
+                    </div>
+                    
+                    <div class="chart-placeholder">
+                        <canvas id="activityChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="lang-ar">نمو الإيرادات الشهري</h3>
+                        <h3 class="lang-fr">Croissance des revenus mensuels</h3>
+                        <h3 class="lang-en">Monthly Revenue Growth</h3>
+                    </div>
+                    
+                    <div class="chart-placeholder">
+                        <canvas id="growthChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم التقارير -->
+        <section id="reports" class="content-section">
+            <div class="reports-section">
+                <div class="section-title">
+                    <h2>
+                        <i class="fas fa-file-alt"></i>
+                        <span class="lang-ar">التقارير والتحميلات</span>
+                        <span class="lang-fr">Rapports et téléchargements</span>
+                        <span class="lang-en">Reports & Downloads</span>
+                    </h2>
+                </div>
+                
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <h4 class="lang-ar">تقرير يومي</h4>
+                        <h4 class="lang-fr">Rapport quotidien</h4>
+                        <h4 class="lang-en">Daily Report</h4>
+                        <p class="lang-ar">تحميل تقرير المعاملات اليومية بالتفاصيل الكاملة</p>
+                        <p class="lang-fr">Télécharger le rapport quotidien des transactions avec tous les détails</p>
+                        <p class="lang-en">Download daily transaction report with full details</p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            <span class="lang-ar">تحميل PDF</span>
+                            <span class="lang-fr">Télécharger PDF</span>
+                            <span class="lang-en">Download PDF</span>
+                        </button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <h4 class="lang-ar">تقرير أسبوعي</h4>
+                        <h4 class="lang-fr">Rapport hebdomadaire</h4>
+                        <h4 class="lang-en">Weekly Report</h4>
+                        <p class="lang-ar">ملخص أسبوعي للإيرادات والإحصائيات</p>
+                        <p class="lang-fr">Résumé hebdomadaire des revenus et des statistiques</p>
+                        <p class="lang-en">Weekly summary of revenue and statistics</p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            <span class="lang-ar">تحميل PDF</span>
+                            <span class="lang-fr">Télécharger PDF</span>
+                            <span class="lang-en">Download PDF</span>
+                        </button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-calendar-month"></i>
+                        </div>
+                        <h4 class="lang-ar">تقرير شهري</h4>
+                        <h4 class="lang-fr">Rapport mensuel</h4>
+                        <h4 class="lang-en">Monthly Report</h4>
+                        <p class="lang-ar">تقرير مفصل للمعاملات والإيرادات الشهرية</p>
+                        <p class="lang-fr">Rapport détaillé des transactions et revenus mensuels</p>
+                        <p class="lang-en">Detailed report of monthly transactions and revenue</p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            <span class="lang-ar">تحميل PDF</span>
+                            <span class="lang-fr">Télécharger PDF</span>
+                            <span class="lang-en">Download PDF</span>
+                        </button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <div class="report-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <h4 class="lang-ar">تقرير ضريبي</h4>
+                        <h4 class="lang-fr">Rapport fiscal</h4>
+                        <h4 class="lang-en">Tax Report</h4>
+                        <p class="lang-ar">تقرير خاص بالضرائب والمتطلبات القانونية</p>
+                        <p class="lang-fr">Rapport spécial pour les taxes et exigences légales</p>
+                        <p class="lang-en">Special report for taxes and legal requirements</p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download"></i>
+                            <span class="lang-ar">تحميل Excel</span>
+                            <span class="lang-fr">Télécharger Excel</span>
+                            <span class="lang-en">Download Excel</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الإعدادات -->
+        <section id="settings" class="content-section">
+            <div class="settings-section">
+                <div class="section-title">
+                    <h2>
+                        <i class="fas fa-cog"></i>
+                        <span class="lang-ar">إعدادات الحساب</span>
+                        <span class="lang-fr">Paramètres du compte</span>
+                        <span class="lang-en">Account Settings</span>
+                    </h2>
+                </div>
+                
+                <form class="settings-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="businessName" class="lang-ar">اسم المؤسسة</label>
+                            <label for="businessName" class="lang-fr">Nom de l'établissement</label>
+                            <label for="businessName" class="lang-en">Business Name</label>
+                            <input type="text" id="businessName" class="form-control" value="فندق الجزائر الدولي" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="partnerType" class="lang-ar">نوع الشريك</label>
+                            <label for="partnerType" class="lang-fr">Type de partenaire</label>
+                            <label for="partnerType" class="lang-en">Partner Type</label>
+                            <select id="partnerType" class="form-control">
+                                <option value="hotel" selected class="lang-ar">فندق</option>
+                                <option value="hotel" selected class="lang-fr">Hôtel</option>
+                                <option value="hotel" selected class="lang-en">Hotel</option>
+                                
+                                <option value="restaurant" class="lang-ar">مطعم</option>
+                                <option value="restaurant" class="lang-fr">Restaurant</option>
+                                <option value="restaurant" class="lang-en">Restaurant</option>
+                                
+                                <option value="transport" class="lang-ar">نقل سياحي</option>
+                                <option value="transport" class="lang-fr">Transport touristique</option>
+                                <option value="transport" class="lang-en">Tourist Transport</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone" class="lang-ar">رقم الهاتف</label>
+                            <label for="phone" class="lang-fr">Numéro de téléphone</label>
+                            <label for="phone" class="lang-en">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" value="+213 21 34 56 78" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="lang-ar">البريد الإلكتروني</label>
+                            <label for="email" class="lang-fr">Adresse e-mail</label>
+                            <label for="email" class="lang-en">Email Address</label>
+                            <input type="email" id="email" class="form-control" value="hotel@example.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="lang-ar">العنوان</label>
+                        <label for="address" class="lang-fr">Adresse</label>
+                        <label for="address" class="lang-en">Address</label>
+                        <textarea id="address" class="form-control" rows="2" required>الجزائر العاصمة، حي المرادية</textarea>
+                    </div>
+                    
+                    <div class="section-title" style="margin-top: 40px; margin-bottom: 20px;">
+                        <h3>
+                            <i class="fas fa-lock"></i>
+                            <span class="lang-ar">تغيير كلمة المرور</span>
+                            <span class="lang-fr">Changer le mot de passe</span>
+                            <span class="lang-en">Change Password</span>
+                        </h3>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="currentPassword" class="lang-ar">كلمة المرور الحالية</label>
+                            <label for="currentPassword" class="lang-fr">Mot de passe actuel</label>
+                            <label for="currentPassword" class="lang-en">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword" class="lang-ar">كلمة المرور الجديدة</label>
+                            <label for="newPassword" class="lang-fr">Nouveau mot de passe</label>
+                            <label for="newPassword" class="lang-en">New Password</label>
+                            <input type="password" id="newPassword" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span class="lang-ar">حفظ التغييرات</span>
+                        <span class="lang-fr">Enregistrer les modifications</span>
+                        <span class="lang-en">Save Changes</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- قسم الدعم -->
+        <section id="support" class="content-section">
+            <div class="support-section">
+                <div class="section-title">
+                    <h2>
+                        <i class="fas fa-headset"></i>
+                        <span class="lang-ar">الدعم الفني والاتصال</span>
+                        <span class="lang-fr">Support technique et contact</span>
+                        <span class="lang-en">Technical Support & Contact</span>
+                    </h2>
+                </div>
+                
+                <div class="support-grid">
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h4 class="lang-ar">الدعم الفني</h4>
+                        <h4 class="lang-fr">Support technique</h4>
+                        <h4 class="lang-en">Technical Support</h4>
+                        <p class="lang-ar">متاح من 8 صباحاً حتى 10 مساءً</p>
+                        <p class="lang-fr">Disponible de 8h à 22h</p>
+                        <p class="lang-en">Available from 8 AM to 10 PM</p>
+                        <a href="tel:+21321345678">
+                            <i class="fas fa-phone"></i> +213 21 34 56 78
+                        </a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h4 class="lang-ar">البريد الإلكتروني</h4>
+                        <h4 class="lang-fr">E-mail</h4>
+                        <h4 class="lang-en">Email</h4>
+                        <p class="lang-ar">رد خلال 24 ساعة عمل</p>
+                        <p class="lang-fr">Réponse dans les 24 heures</p>
+                        <p class="lang-en">Response within 24 business hours</p>
+                        <a href="mailto:support@algeriatouristpass.com">
+                            <i class="fas fa-envelope"></i> support@algeriatouristpass.com
+                        </a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h4 class="lang-ar">التقارير والمحاسبة</h4>
+                        <h4 class="lang-fr">Rapports et comptabilité</h4>
+                        <h4 class="lang-en">Reports & Accounting</h4>
+                        <p class="lang-ar">تقارير شهرية وضريبية</p>
+                        <p class="lang-fr">Rapports mensuels et fiscaux</p>
+                        <p class="lang-en">Monthly and tax reports</p>
+                        <a href="#reports" class="go-to-reports">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span class="lang-ar">الذهاب إلى التقارير</span>
+                            <span class="lang-fr">Aller aux rapports</span>
+                            <span class="lang-en">Go to Reports</span>
+                        </a>
+                    </div>
+                    
+                    <div class="support-card">
+                        <div class="support-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h4 class="lang-ar">الأسئلة الشائعة</h4>
+                        <h4 class="lang-fr">FAQ</h4>
+                        <h4 class="lang-en">FAQ</h4>
+                        <p class="lang-ar">إجابات عن الأسئلة المتكررة</p>
+                        <p class="lang-fr">Réponses aux questions fréquentes</p>
+                        <p class="lang-en">Answers to frequently asked questions</p>
+                        <a href="#">
+                            <i class="fas fa-book"></i>
+                            <span class="lang-ar">فتح دليل الاستخدام</span>
+                            <span class="lang-fr">Ouvrir le guide d'utilisation</span>
+                            <span class="lang-en">Open User Guide</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- الفوتر -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>Pass Algeria Tourist</h3>
+                <p class="lang-ar">نظام الشريك السياحي - نسخة 3.0</p>
+                <p class="lang-fr">Système partenaire touristique - Version 3.0</p>
+                <p class="lang-en">Tourist Partner System - Version 3.0</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4 class="lang-ar">روابط سريعة</h4>
+                <h4 class="lang-fr">Liens rapides</h4>
+                <h4 class="lang-en">Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">
+                        <span class="lang-ar">الصفحة الرئيسية</span>
+                        <span class="lang-fr">Page d'accueil</span>
+                        <span class="lang-en">Home Page</span>
+                    </a></li>
+                    <li><a href="#transactions">
+                        <span class="lang-ar">إضافة معاملة</span>
+                        <span class="lang-fr">Ajouter transaction</span>
+                        <span class="lang-en">Add Transaction</span>
+                    </a></li>
+                    <li><a href="#history">
+                        <span class="lang-ar">سجل المعاملات</span>
+                        <span class="lang-fr">Historique</span>
+                        <span class="lang-en">History</span>
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4 class="lang-ar">مساعدة</h4>
+                <h4 class="lang-fr">Aide</h4>
+                <h4 class="lang-en">Help</h4>
+                <ul>
+                    <li><a href="#support">
+                        <span class="lang-ar">الدعم الفني</span>
+                        <span class="lang-fr">Support technique</span>
+                        <span class="lang-en">Technical Support</span>
+                    </a></li>
+                    <li><a href="#settings">
+                        <span class="lang-ar">الإعدادات</span>
+                        <span class="lang-fr">Paramètres</span>
+                        <span class="lang-en">Settings</span>
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p id="copyrightText"></p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // ===== JavaScript: لوحة الشريك السياحي المحسنة =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // === المتغيرات العامة ===
+            let transactionsChart, revenueChart, activityChart, growthChart;
+            let isSidebarOpen = true;
+            
+            // === تحديث السنة في الفوتر ===
+            function updateCopyrightYear() {
+                const currentYear = new Date().getFullYear();
+                const copyrightText = document.getElementById('copyrightText');
+                const currentLang = document.body.getAttribute('data-lang');
+                
+                let text = '';
+                if(currentLang === 'ar') {
+                    text = `© ${currentYear} نظام الشريك السياحي - Pass Algeria Tourist. جميع الحقوق محفوظة.<br>
+                    هذه النسخة مخصصة للشركاء المعتمدين فقط.`;
+                } else if(currentLang === 'fr') {
+                    text = `© ${currentYear} Système partenaire touristique - Pass Algeria Tourist. Tous droits réservés.<br>
+                    Cette version est réservée aux partenaires agréés uniquement.`;
+                } else {
+                    text = `© ${currentYear} Tourist Partner System - Pass Algeria Tourist. All rights reserved.<br>
+                    This version is for authorized partners only.`;
+                }
+                
+                copyrightText.innerHTML = text;
+            }
+            
+            // === نظام اللغة ===
+            const currentFlag = document.getElementById('currentFlag');
+            const languageOptions = document.getElementById('languageOptions');
+            const languageOptionsList = document.querySelectorAll('.language-option');
+            
+            currentFlag.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageOptions.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', function() {
+                languageOptions.classList.remove('show');
+            });
+            
+            languageOptions.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            languageOptionsList.forEach(option => {
+                option.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    document.body.setAttribute('data-lang', lang);
+                    
+                    const flagClass = this.className.split(' ')[1];
+                    currentFlag.className = 'current-flag ' + flagClass;
+                    currentFlag.setAttribute('title', this.getAttribute('title'));
+                    
+                    localStorage.setItem('preferredLang', lang);
+                    languageOptions.classList.remove('show');
+                    updateCopyrightYear();
+                    updateChartsLabels();
+                });
+            });
+            
+            const savedLang = localStorage.getItem('preferredLang') || 'ar';
+            document.body.setAttribute('data-lang', savedLang);
+            
+            if(savedLang === 'ar') {
+                currentFlag.className = 'current-flag flag-ar';
+                currentFlag.title = 'العربية';
+            } else if(savedLang === 'fr') {
+                currentFlag.className = 'current-flag flag-fr';
+                currentFlag.title = 'Français';
+            } else {
+                currentFlag.className = 'current-flag flag-en';
+                currentFlag.title = 'English';
+            }
+            
+            // === إدارة القائمة الجانبية ===
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.getElementById('menuBtn');
+            const mainContent = document.getElementById('mainContent');
+            
+            function toggleSidebar() {
+                isSidebarOpen = !isSidebarOpen;
+                if (window.innerWidth > 992) {
+                    if (isSidebarOpen) {
+                        sidebar.classList.remove('collapsed');
+                        mainContent.classList.add('with-sidebar');
+                    } else {
+                        sidebar.classList.add('collapsed');
+                        mainContent.classList.remove('with-sidebar');
+                    }
+                } else {
+                    // على الهواتف، القائمة تكون منبثقة
+                    sidebar.classList.toggle('open');
+                }
+            }
+            
+            menuBtn.addEventListener('click', toggleSidebar);
+            
+            // إغلاق القائمة عند النقر خارجها على الهواتف
+            if (window.innerWidth <= 992) {
+                document.addEventListener('click', function(e) {
+                    if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+            }
+            
+            // === التنقل بين الأقسام ===
+            const sidebarItems = document.querySelectorAll('.sidebar-item[data-section]');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            function switchSection(sectionId) {
+                // تحديد العنصر النشط في القائمة الجانبية
+                sidebarItems.forEach(item => {
+                    if (item.getAttribute('data-section') === sectionId) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // إظهار القسم المحدد وإخفاء الآخرين
+                contentSections.forEach(section => {
+                    if (section.id === sectionId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                
+                // إغلاق القائمة الجانبية على الهواتف
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.remove('open');
+                }
+                
+                // تحديث الرسوم البيانية إذا كان قسم الإحصائيات
+                if (sectionId === 'statistics') {
+                    setTimeout(initCharts, 100);
+                }
+            }
+            
+            sidebarItems.forEach(item => {
+                if (item.getAttribute('data-section')) {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const sectionId = this.getAttribute('data-section');
+                        switchSection(sectionId);
+                    });
+                }
+            });
+            
+            // زر تسجيل الخروج في القائمة الجانبية
+            document.getElementById('sidebarLogout').addEventListener('click', function() {
+                const currentLang = document.body.getAttribute('data-lang');
+                let message = '';
+                
+                if(currentLang === 'ar') {
+                    message = 'هل أنت متأكد من تسجيل الخروج من حساب الشريك؟';
+                } else if(currentLang === 'fr') {
+                    message = 'Êtes-vous sûr de vouloir vous déconnecter du compte partenaire ?';
+                } else {
+                    message = 'Are you sure you want to logout from the partner account?';
+                }
+                
+                if(confirm(message)) {
+                    localStorage.removeItem('partnerLoggedIn');
+                    
+                    if(currentLang === 'ar') {
+                        alert('تم تسجيل الخروج بنجاح');
+                    } else if(currentLang === 'fr') {
+                        alert('Déconnexion réussie');
+                    } else {
+                        alert('Logged out successfully');
+                    }
+                    
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // === إضافة معاملة جديدة ===
+            const transactionForm = document.getElementById('transactionForm');
+            const qrDisplay = document.getElementById('qrDisplay');
+            const qrCode = document.getElementById('qrCode');
+            const transactionId = document.getElementById('transactionId');
+            const transactionAmount = document.getElementById('transactionAmount');
+            const transactionTime = document.getElementById('transactionTime');
+            const confirmTransactionBtn = document.getElementById('confirmTransaction');
+            
+            transactionForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const amount = document.getElementById('amount').value;
+                const serviceType = document.getElementById('serviceType').value;
+                const description = document.getElementById('description').value;
+                const currentLang = document.body.getAttribute('data-lang');
+                
+                if(!amount || amount < 100) {
+                    let message = '';
+                    if(currentLang === 'ar') {
+                        message = 'يرجى إدخال مبلغ صحيح (100 دج على الأقل)';
+                    } else if(currentLang === 'fr') {
+                        message = 'Veuillez saisir un montant valide (au moins 100 DA)';
+                    } else {
+                        message = 'Please enter a valid amount (at least 100 DZD)';
+                    }
+                    alert(message);
+                    return;
+                }
+                
+                // توليد رقم معاملة عشوائي
+                const newTransactionId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+                
+                // تحديث الوقت الحالي
+                const now = new Date();
+                const formattedTime = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+                
+                // تحديث عرض QR Code
+                transactionId.textContent = newTransactionId;
+                transactionAmount.textContent = parseInt(amount).toLocaleString('ar-EG') + ' دج';
+                transactionTime.textContent = formattedTime;
+                
+                // تغيير لون QR Code حسب نوع الخدمة
+                const serviceColors = {
+                    hotel: '#3498db',
+                    restaurant: '#e74c3c',
+                    transport: '#2ecc71',
+                    museum: '#9b59b6',
+                    activity: '#f39c12'
+                };
+                
+                qrCode.style.color = serviceColors[serviceType] || '#3498db';
+                
+                // عرض QR Code
+                qrDisplay.classList.add('show');
+                
+                // تمرير إلى الأعلى
+                qrDisplay.scrollIntoView({behavior: 'smooth'});
+                
+                // إعادة تعيين النموذج
+                transactionForm.reset();
+            });
+            
+            // === تأكيد اتمام المعاملة ===
+            confirmTransactionBtn.addEventListener('click', function() {
+                const currentLang = document.body.getAttribute('data-lang');
+                let message = '';
+                
+                if(currentLang === 'ar') {
+                    message = 'تم تأكيد اتمام الدفع بنجاح!';
+                } else if(currentLang === 'fr') {
+                    message = 'Paiement confirmé avec succès !';
+                } else {
+                    message = 'Payment confirmed successfully!';
+                }
+                
+                alert(message);
+                qrDisplay.classList.remove('show');
+                
+                // إضافة المعاملة إلى الجدول
+                addTransactionToTable();
+                
+                // تحديث الإحصائيات
+                updateStats();
+            });
+            
+            // === ملء جدول المعاملات ===
+            function populateTransactionsTable() {
+                const transactions = [
+                    { id: 'TXN-789456', date: '15/04/2024 14:30', amount: '5,000 دج', card: 'ATP-5879***', status: 'completed' },
+                    { id: 'TXN-789455', date: '15/04/2024 12:15', amount: '12,500 دج', card: 'ATP-2147***', status: 'completed' },
+                    { id: 'TXN-789454', date: '15/04/2024 10:45', amount: '8,200 دج', card: 'ATP-3698***', status: 'completed' },
+                    { id: 'TXN-789453', date: '14/04/2024 18:20', amount: '3,500 دج', card: 'ATP-7452***', status: 'completed' },
+                    { id: 'TXN-789452', date: '14/04/2024 16:10', amount: '15,000 دج', card: 'ATP-1587***', status: 'pending' }
+                ];
+                
+                const tbody = document.querySelector('.transactions-table tbody');
+                tbody.innerHTML = '';
+                
+                transactions.forEach(transaction => {
+                    const statusText = {
+                        completed: { ar: 'مكتملة', fr: 'Complétée', en: 'Completed' },
+                        pending: { ar: 'بانتظار التأكيد', fr: 'En attente', en: 'Pending' },
+                        cancelled: { ar: 'ملغاة', fr: 'Annulée', en: 'Cancelled' }
+                    };
+                    
+                    const statusClass = {
+                        completed: 'status-completed',
+                        pending: 'status-pending',
+                        cancelled: 'status-cancelled'
+                    };
+                    
+                    const currentLang = document.body.getAttribute('data-lang');
+                    const status = statusText[transaction.status][currentLang] || statusText[transaction.status]['ar'];
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="transaction-id">${transaction.id}</span></td>
+                        <td>${transaction.date}</td>
+                        <td><span class="transaction-amount">${transaction.amount}</span></td>
+                        <td>${transaction.card}</td>
+                        <td><span class="status-badge-sm ${statusClass[transaction.status]}">${status}</span></td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="table-action-btn" title="طباعة">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                                <button class="table-action-btn" title="تفاصيل">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+                
+                // إضافة أحداث للأزرار
+                document.querySelectorAll('.table-action-btn .fa-print').forEach(btn => {
+                    btn.closest('.table-action-btn').addEventListener('click', function() {
+                        const currentLang = document.body.getAttribute('data-lang');
+                        let message = '';
+                        
+                        if(currentLang === 'ar') {
+                            message = 'سيتم طباعة إيصال المعاملة';
+                        } else if(currentLang === 'fr') {
+                            message = 'Le reçu de transaction sera imprimé';
+                        } else {
+                            message = 'Transaction receipt will be printed';
+                        }
+                        
+                        alert(message);
+                    });
+                });
+                
+                document.querySelectorAll('.table-action-btn .fa-eye').forEach(btn => {
+                    btn.closest('.table-action-btn').addEventListener('click', function() {
+                        const row = this.closest('tr');
+                        const transactionId = row.querySelector('.transaction-id').textContent;
+                        
+                        const currentLang = document.body.getAttribute('data-lang');
+                        let message = '';
+                        
+                        if(currentLang === 'ar') {
+                            message = `عرض تفاصيل المعاملة: ${transactionId}`;
+                        } else if(currentLang === 'fr') {
+                            message = `Afficher les détails de la transaction: ${transactionId}`;
+                        } else {
+                            message = `Show transaction details: ${transactionId}`;
+                        }
+                        
+                        alert(message);
+                    });
+                });
+            }
+            
+            // === إضافة معاملة جديدة إلى الجدول ===
+            function addTransactionToTable() {
+                const now = new Date();
+                const formattedDate = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+                const amount = parseInt(document.getElementById('amount').value || 5000);
+                const formattedAmount = amount.toLocaleString('ar-EG') + ' دج';
+                const newId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+                const cardNumber = 'ATP-' + Math.floor(1000 + Math.random() * 9000) + '***';
+                
+                const tbody = document.querySelector('.transactions-table tbody');
+                const currentLang = document.body.getAttribute('data-lang');
+                
+                const statusText = {
+                    completed: { ar: 'مكتملة', fr: 'Complétée', en: 'Completed' }
+                };
+                
+                const status = statusText.completed[currentLang] || statusText.completed['ar'];
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="transaction-id">${newId}</span></td>
+                    <td>${formattedDate}</td>
+                    <td><span class="transaction-amount">${formattedAmount}</span></td>
+                    <td>${cardNumber}</td>
+                    <td><span class="status-badge-sm status-completed">${status}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="table-action-btn" title="طباعة">
+                                <i class="fas fa-print"></i>
+                            </button>
+                            <button class="table-action-btn" title="تفاصيل">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                // إدراج في الأعلى
+                tbody.insertBefore(row, tbody.firstChild);
+                
+                // تحديث العداد
+                const transactionCount = document.querySelector('.partner-stat .value');
+                const currentCount = parseInt(transactionCount.textContent.replace(/,/g, ''));
+                transactionCount.textContent = (currentCount + 1).toLocaleString('ar-EG');
+            }
+            
+            // === تحديث الإحصائيات ===
+            function updateStats() {
+                // تحديث إحصائيات اليوم
+                const todayTransactions = document.querySelectorAll('.quick-stats .stat-card')[0];
+                const todayValue = todayTransactions.querySelector('.stat-value');
+                const currentCount = parseInt(todayValue.textContent);
+                todayValue.textContent = currentCount + 1;
+                
+                // تحديث إيرادات اليوم
+                const todayRevenue = document.querySelectorAll('.quick-stats .stat-card')[1];
+                const revenueValue = todayRevenue.querySelector('.stat-value');
+                const amount = parseInt(document.getElementById('amount').value || 5000);
+                const currentRevenue = parseInt(revenueValue.textContent.replace(/,/g, '').replace(' دج', ''));
+                revenueValue.textContent = (currentRevenue + amount).toLocaleString('ar-EG') + ' دج';
+                
+                // تحديث المتوسط
+                const avgCard = document.querySelectorAll('.quick-stats .stat-card')[3];
+                const avgValue = avgCard.querySelector('.stat-value');
+                const totalTransactions = parseInt(document.querySelector('.partner-stat .value').textContent.replace(/,/g, ''));
+                const totalRevenue = 1247000 + amount; // إيرادات افتراضية + الجديدة
+                const newAvg = Math.round(totalRevenue / totalTransactions);
+                avgValue.textContent = newAvg.toLocaleString('ar-EG') + ' دج';
+            }
+            
+            // === الرسوم البيانية ===
+            function initCharts() {
+                const currentLang = document.body.getAttribute('data-lang');
+                
+                // بيانات للرسوم البيانية
+                const days = currentLang === 'ar' ? ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'] :
+                          currentLang === 'fr' ? ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'] :
+                          ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                
+                const services = currentLang === 'ar' ? ['فنادق', 'مطاعم', 'نقل', 'متاحف', 'أنشطة'] :
+                              currentLang === 'fr' ? ['Hôtels', 'Restaurants', 'Transport', 'Musées', 'Activités'] :
+                              ['Hotels', 'Restaurants', 'Transport', 'Museums', 'Activities'];
+                
+                const hours = currentLang === 'ar' ? ['8 ص', '10 ص', '12 ظ', '2 م', '4 م', '6 م', '8 م', '10 م'] :
+                            currentLang === 'fr' ? ['8h', '10h', '12h', '14h', '16h', '18h', '20h', '22h'] :
+                            ['8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM', '10 PM'];
+                
+                const months = currentLang === 'ar' ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'] :
+                             currentLang === 'fr' ? ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'] :
+                             ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                
+                // 1. رسم بياني للمعاملات اليومية
+                if (transactionsChart) transactionsChart.destroy();
+                const transactionsCtx = document.getElementById('transactionsChart').getContext('2d');
+                transactionsChart = new Chart(transactionsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: days,
+                        datasets: [{
+                            label: currentLang === 'ar' ? 'عدد المعاملات' : 
+                                   currentLang === 'fr' ? 'Nombre de transactions' : 'Number of Transactions',
+                            data: [45, 52, 38, 47, 62, 55, 48],
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 2. رسم بياني للإيرادات حسب الخدمة
+                if (revenueChart) revenueChart.destroy();
+                const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+                revenueChart = new Chart(revenueCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: services,
+                        datasets: [{
+                            data: [45000, 28000, 15000, 9000, 7000],
+                            backgroundColor: [
+                                '#3498db', // أزرق للفنادق
+                                '#e74c3c', // أحمر للمطاعم
+                                '#2ecc71', // أخضر للنقل
+                                '#9b59b6', // بنفسجي للمتاحف
+                                '#f39c12'  // برتقالي للأنشطة
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    padding: 20
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 3. رسم بياني لفترات النشاط
+                if (activityChart) activityChart.destroy();
+                const activityCtx = document.getElementById('activityChart').getContext('2d');
+                activityChart = new Chart(activityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: hours,
+                        datasets: [{
+                            label: currentLang === 'ar' ? 'عدد المعاملات' : 
+                                   currentLang === 'fr' ? 'Nombre de transactions' : 'Number of Transactions',
+                            data: [12, 18, 25, 32, 28, 35, 42, 30],
+                            backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 4. رسم بياني لنمو الإيرادات
+                if (growthChart) growthChart.destroy();
+                const growthCtx = document.getElementById('growthChart').getContext('2d');
+                growthChart = new Chart(growthCtx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: currentLang === 'ar' ? 'الإيرادات (ألف دينار)' : 
+                                   currentLang === 'fr' ? 'Revenus (mille DA)' : 'Revenue (thousand DZD)',
+                            data: [120, 145, 180, 210, 245, 280],
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    callback: function(value) {
+                                        return value + 'K';
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // تحديث تسميات الرسوم البيانية عند تغيير اللغة
+            function updateChartsLabels() {
+                if (document.getElementById('statistics').classList.contains('active')) {
+                    initCharts();
+                }
+            }
+            
+            // === تصفية الرسوم البيانية ===
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // في تطبيق حقيقي، هنا يتم تحديث بيانات الرسم البياني
+                    const period = this.getAttribute('data-period');
+                    // simulate data change
+                    if (transactionsChart) {
+                        // تحديث البيانات حسب الفترة
+                        const newData = period === '7' ? [45, 52, 38, 47, 62, 55, 48] :
+                                      period === '30' ? Array.from({length: 30}, () => Math.floor(Math.random() * 60) + 20) :
+                                      Array.from({length: 90}, () => Math.floor(Math.random() * 70) + 10);
+                        
+                        transactionsChart.data.datasets[0].data = newData;
+                        transactionsChart.update();
+                    }
+                });
+            });
+            
+            // === التحكم في إعدادات القائمة الجانبية ===
+            function handleResize() {
+                if (window.innerWidth > 992) {
+                    // على أجهزة الكمبيوتر
+                    sidebar.classList.remove('open');
+                    if (isSidebarOpen) {
+                        sidebar.classList.remove('collapsed');
+                        mainContent.classList.add('with-sidebar');
+                    } else {
+                        sidebar.classList.add('collapsed');
+                        mainContent.classList.remove('with-sidebar');
+                    }
+                } else {
+                    // على الهواتف
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.remove('with-sidebar');
+                    sidebar.classList.remove('open');
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+            
+            // === تهيئة التطبيق ===
+            function initializeApp() {
+                updateCopyrightYear();
+                populateTransactionsTable();
+                initCharts();
+                handleResize();
+                
+                // محاكاة بيانات الشريك المسجل
+                localStorage.setItem('partnerLoggedIn', 'true');
+                
+                // تحديث أيقونة الحساب
+                const userIcon = document.getElementById('userIcon');
+                userIcon.addEventListener('click', function() {
+                    toggleSidebar();
+                });
+                
+                // روابط الانتقال بين الأقسام
+                document.querySelectorAll('.go-to-reports').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        switchSection('reports');
+                    });
+                });
+            }
+            
+            initializeApp();
+        });
+    </script>
+</body>
+</html>

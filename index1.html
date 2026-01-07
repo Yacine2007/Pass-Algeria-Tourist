@@ -1,0 +1,3339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>لوحة تحكم السائح | Pass Algeria Tourist</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* ===== CSS: لوحة تحكم السائح ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        :root {
+            --primary: #1a9c9c;    /* فيروزي مخضر */
+            --secondary: #d4af37;  /* ذهبي */
+            --dark: #1a3c3c;       /* أخضر داكن */
+            --light: #f8f9fa;      /* أبيض فاتح */
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* ===== الهيدر الثابت ===== */
+        .main-header {
+            background-color: var(--primary);
+            height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* ===== الشريط الذهبي المتموج ===== */
+        .gold-wave-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35px;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .gold-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: calc(100% + 1.3px);
+            height: 35px;
+        }
+        
+        .gold-wave::after {
+            content: '';
+            position: absolute;
+            bottom: 1px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            fill: none;
+            stroke: var(--secondary);
+            stroke-width: 20;
+            background: none;
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 150' preserveAspectRatio='none'%3E%3Cpath d='M0,80 C150,150 350,0 500,80'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 150' preserveAspectRatio='none'%3E%3Cpath d='M0,80 C150,150 350,0 500,80'/%3E%3C/svg%3E");
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+        }
+        
+        /* ===== الشعار ===== */
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-text {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+        
+        .logo-pass {
+            color: var(--secondary);
+            font-size: 1.4rem;
+            font-weight: 900;
+        }
+        
+        .logo-main {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        /* ===== عناصر التحكم ===== */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ===== قائمة اللغة المنسدلة ===== */
+        .language-dropdown {
+            position: relative;
+        }
+        
+        .current-flag {
+            width: 40px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border: 2px solid white;
+        }
+        
+        .current-flag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .flag-ar {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Flag_of_Algeria.svg/800px-Flag_of_Algeria.svg.png');
+        }
+        
+        .flag-fr {
+            background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Flag_of_France.svg/800px-Flag_of_France.svg.png');
+        }
+        
+        .flag-en {
+            background-image: url('https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/Flag_of_the_United_Kingdom.svg/800px-Flag_of_the_United_Kingdom.svg.png');
+        }
+        
+        .language-options {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-hover);
+            min-width: 60px;
+            display: none;
+            z-index: 1002;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .language-options.show {
+            display: block;
+            animation: dropdownAppear 0.2s ease-out;
+        }
+        
+        .language-option {
+            width: 40px;
+            height: 30px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .language-option:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+        
+        @keyframes dropdownAppear {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== أيقونة الحساب ===== */
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--secondary);
+            font-weight: bold;
+        }
+        
+        .user-icon:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+        
+        /* ===== زر القائمة ===== */
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .menu-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        /* ===== القائمة المنسدلة الرئيسية ===== */
+        .dropdown-menu {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            max-width: 320px;
+            margin: 0 auto;
+            display: none;
+            z-index: 1001;
+            overflow: hidden;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+            animation: menuAppear 0.3s ease-out;
+        }
+        
+        @keyframes menuAppear {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown-item {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-bottom: 1px solid var(--gray-light);
+            color: var(--dark);
+            text-decoration: none;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light);
+        }
+        
+        .dropdown-item i {
+            color: var(--primary);
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* ===== التخطيط الرئيسي ===== */
+        .main-layout {
+            padding-top: 70px;
+            min-height: 100vh;
+        }
+        
+        /* ===== القائمة الجانبية للكمبيوتر ===== */
+        .sidebar-desktop {
+            display: none;
+        }
+        
+        /* ===== المحتوى الرئيسي ===== */
+        .main-content {
+            padding: 20px;
+        }
+        
+        /* ===== بطاقات النظرة العامة ===== */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 25px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .welcome-section h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-section p {
+            opacity: 0.9;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        /* ===== بطاقة مصغرة في لوحة التحكم ===== */
+        .card-mini-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .card-mini-title {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .card-mini-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            display: block;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .card-mini-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1a3c3c 0%, #1a9c9c 100%);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            gap: 15px;
+        }
+        
+        .card-mini-placeholder i {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+        
+        /* ===== قسم بطاقتي ===== */
+        .card-display-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .section-header {
+            margin-bottom: 20px;
+        }
+        
+        .section-header h2 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 140px;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #158787;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #c19a2c;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--light);
+        }
+        
+        .card-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .card-image-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .card-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 15px;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .card-placeholder {
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            background: linear-gradient(135deg, #1a3c3c 0%, #1a9c9c 100%);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            gap: 20px;
+            margin: 0 auto;
+        }
+        
+        .card-placeholder i {
+            font-size: 3.5rem;
+            color: var(--secondary);
+        }
+        
+        .card-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .card-info-item {
+            padding: 12px;
+            background: var(--light);
+            border-radius: 10px;
+        }
+        
+        .card-info-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .card-info-value {
+            font-size: 1rem;
+            color: var(--dark);
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto 0;
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        /* ===== قسم الرصيد والشحن ===== */
+        .balance-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .current-balance {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .balance-label {
+            font-size: 1.1rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .balance-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .currency {
+            font-size: 1.8rem;
+            color: var(--gray);
+        }
+        
+        .quick-recharge {
+            margin-bottom: 30px;
+        }
+        
+        .recharge-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .recharge-option {
+            background: var(--light);
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            padding: 18px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .recharge-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .recharge-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(26, 156, 156, 0.1);
+        }
+        
+        .recharge-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .custom-recharge {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: #fff;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 156, 156, 0.2);
+        }
+        
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .payment-method {
+            background: var(--light);
+            border: 2px solid var(--gray-light);
+            border-radius: 10px;
+            padding: 18px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--primary);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--primary);
+            background-color: rgba(26, 156, 156, 0.1);
+        }
+        
+        .payment-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        /* ===== قسم العمليات ===== */
+        .transactions-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--light);
+            border: 1px solid var(--gray-light);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .search-box {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--gray-light);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        
+        th {
+            background-color: var(--light);
+            padding: 14px 12px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--gray-light);
+            font-size: 0.9rem;
+        }
+        
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--gray-light);
+            font-size: 0.9rem;
+        }
+        
+        tr:hover {
+            background-color: var(--light);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-failed {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+        }
+        
+        /* ===== قسم الخريطة السياحية ===== */
+        .map-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .map-container {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 20px;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .map-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--light);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .map-filter:hover {
+            background-color: #e9ecef;
+        }
+        
+        .map-filter.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .map-filter i {
+            font-size: 1rem;
+        }
+        
+        /* ===== قسم الخدمات ===== */
+        .services-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .services-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--gray-light);
+            padding-bottom: 15px;
+        }
+        
+        .tab-btn {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .services-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .service-item {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            gap: 15px;
+            transition: transform 0.3s;
+        }
+        
+        .service-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+        
+        .service-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        
+        .service-info h4 {
+            margin-bottom: 6px;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+        
+        .service-date {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        
+        .service-rating {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* ===== قسم العروض ===== */
+        .offers-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .offers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .offer-card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+            background: white;
+        }
+        
+        .offer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .offer-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .offer-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .offer-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .offer-body {
+            padding: 20px;
+        }
+        
+        .offer-desc {
+            color: var(--gray);
+            margin-bottom: 15px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .offer-code {
+            background: var(--light);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        /* ===== قسم الإعدادات ===== */
+        .settings-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+        
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--gray-light);
+            padding-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .settings-form {
+            max-width: 100%;
+        }
+        
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light);
+            border-radius: 10px;
+        }
+        
+        .toggle-label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+        
+        .toggle-label span {
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .toggle-label small {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        /* ===== الفوتر ===== */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 30px 20px 20px;
+            margin-top: 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .footer-logo h3 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+        
+        .footer-logo p {
+            color: #ddd;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .footer-links h4 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--secondary);
+            transform: translateX(-5px);
+        }
+        
+        .footer-contact p {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .footer-contact i {
+            color: var(--secondary);
+            width: 20px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        
+        /* ===== نظام اللغات ===== */
+        body[data-lang="fr"] .lang-ar,
+        body[data-lang="en"] .lang-ar {
+            display: none !important;
+        }
+        
+        body[data-lang="ar"] .lang-fr,
+        body[data-lang="ar"] .lang-en,
+        body[data-lang="fr"] .lang-en,
+        body[data-lang="en"] .lang-fr {
+            display: none !important;
+        }
+        
+        /* ===== تحسينات للهواتف ===== */
+        @media (max-width: 480px) {
+            .main-header {
+                height: 60px;
+                padding: 0 15px;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+            
+            .logo-pass, .logo-main {
+                font-size: 1.2rem;
+            }
+            
+            .header-controls {
+                gap: 10px;
+            }
+            
+            .current-flag {
+                width: 35px;
+                height: 26px;
+            }
+            
+            .user-icon {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .menu-btn {
+                font-size: 1.2rem;
+                padding: 8px;
+            }
+            
+            .main-layout {
+                padding-top: 60px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 18px;
+            }
+            
+            .section-header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                min-width: 120px;
+            }
+            
+            .recharge-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+            
+            .map-container {
+                height: 350px;
+            }
+        }
+        
+        /* ===== تحسينات للأجهزة المتوسطة ===== */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .recharge-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .payment-methods {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .services-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .offers-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* ===== تحسينات للكمبيوتر ===== */
+        @media (min-width: 769px) {
+            .main-header {
+                height: 80px;
+                padding: 0 30px;
+            }
+            
+            .logo-text {
+                font-size: 1.5rem;
+            }
+            
+            .logo-pass, .logo-main {
+                font-size: 1.5rem;
+            }
+            
+            .main-layout {
+                display: flex;
+                padding-top: 80px;
+            }
+            
+            .sidebar-desktop {
+                display: block;
+                width: 250px;
+                background: white;
+                box-shadow: 3px 0 15px rgba(0, 0, 0, 0.05);
+                position: fixed;
+                top: 80px;
+                right: 0;
+                bottom: 0;
+                overflow-y: auto;
+                z-index: 999;
+            }
+            
+            .sidebar-content {
+                padding: 25px 20px;
+            }
+            
+            .user-profile {
+                text-align: center;
+                padding-bottom: 25px;
+                border-bottom: 1px solid var(--gray-light);
+                margin-bottom: 25px;
+            }
+            
+            .user-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 2rem;
+                font-weight: bold;
+                margin: 0 auto 15px;
+                border: 4px solid var(--secondary);
+            }
+            
+            .user-name {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: var(--dark);
+                margin-bottom: 5px;
+            }
+            
+            .user-email {
+                color: var(--gray);
+                font-size: 0.85rem;
+                margin-bottom: 10px;
+            }
+            
+            .user-status {
+                display: inline-block;
+                background-color: rgba(40, 167, 69, 0.1);
+                color: var(--success);
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 500;
+            }
+            
+            .sidebar-menu {
+                list-style: none;
+            }
+            
+            .menu-item {
+                margin-bottom: 8px;
+            }
+            
+            .menu-link {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 14px 16px;
+                border-radius: 10px;
+                color: var(--gray);
+                text-decoration: none;
+                transition: all 0.3s;
+                font-weight: 500;
+            }
+            
+            .menu-link:hover {
+                background-color: var(--light);
+                color: var(--primary);
+            }
+            
+            .menu-link.active {
+                background-color: var(--primary);
+                color: white;
+            }
+            
+            .menu-link i {
+                font-size: 1.2rem;
+                width: 24px;
+                text-align: center;
+            }
+            
+            .menu-badge {
+                margin-right: auto;
+                background-color: var(--secondary);
+                color: white;
+                font-size: 0.75rem;
+                padding: 2px 8px;
+                border-radius: 12px;
+            }
+            
+            .main-content {
+                flex: 1;
+                padding: 30px;
+                margin-right: 250px;
+            }
+            
+            footer {
+                margin-right: 250px;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+            
+            .recharge-options {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .payment-methods {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .services-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .offers-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: 1200px;
+                margin: 0 auto 30px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .main-content {
+                padding: 40px;
+            }
+            
+            .welcome-section {
+                padding: 35px 30px;
+            }
+            
+            .card-display-section,
+            .balance-section,
+            .transactions-section,
+            .map-section,
+            .services-section,
+            .offers-section,
+            .settings-section {
+                padding: 30px;
+            }
+        }
+        
+        /* ===== تحسينات للحواسيب اللمسية ===== */
+        @media (hover: none) and (pointer: coarse) {
+            .stat-card:hover, .service-item:hover, .offer-card:hover {
+                transform: none;
+            }
+            
+            .stat-card:active, .service-item:active, .offer-card:active {
+                opacity: 0.9;
+                transform: scale(0.98);
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body data-lang="ar">
+    <!-- الهيدر الثابت -->
+    <header class="main-header">
+        <!-- الشريط الذهبي المتموج -->
+        <div class="gold-wave-container">
+            <div class="gold-wave"></div>
+        </div>
+        
+        <!-- الشعار -->
+        <div class="logo-container">
+            <div class="logo-text">
+                <span class="logo-pass">Pass</span>
+                <span class="logo-main">Algeria Tourist</span>
+            </div>
+        </div>
+        
+        <!-- عناصر التحكم -->
+        <div class="header-controls">
+            <!-- قائمة اللغة المنسدلة -->
+            <div class="language-dropdown">
+                <div class="current-flag flag-ar" id="currentFlag" title="العربية"></div>
+                <div class="language-options" id="languageOptions">
+                    <div class="language-option flag-ar" data-lang="ar" title="العربية"></div>
+                    <div class="language-option flag-fr" data-lang="fr" title="Français"></div>
+                    <div class="language-option flag-en" data-lang="en" title="English"></div>
+                </div>
+            </div>
+            
+            <!-- أيقونة الحساب (تذهب للإعدادات) -->
+            <div class="user-icon" id="userIcon" title="الإعدادات">
+                س
+            </div>
+            
+            <!-- زر القائمة الرئيسية -->
+            <button class="menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- القائمة المنسدلة الرئيسية -->
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="#dashboard" class="dropdown-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span class="lang-ar">لوحة التحكم</span>
+                <span class="lang-fr">Tableau de bord</span>
+                <span class="lang-en">Dashboard</span>
+            </a>
+            <a href="#card" class="dropdown-item">
+                <i class="fas fa-credit-card"></i>
+                <span class="lang-ar">بطاقتي</span>
+                <span class="lang-fr">Ma carte</span>
+                <span class="lang-en">My Card</span>
+            </a>
+            <a href="#balance" class="dropdown-item">
+                <i class="fas fa-wallet"></i>
+                <span class="lang-ar">رصيدي</span>
+                <span class="lang-fr">Mon solde</span>
+                <span class="lang-en">My Balance</span>
+            </a>
+            <a href="#transactions" class="dropdown-item">
+                <i class="fas fa-exchange-alt"></i>
+                <span class="lang-ar">عملياتي</span>
+                <span class="lang-fr">Mes transactions</span>
+                <span class="lang-en">My Transactions</span>
+            </a>
+            <a href="#map" class="dropdown-item">
+                <i class="fas fa-map-marked-alt"></i>
+                <span class="lang-ar">الخريطة السياحية</span>
+                <span class="lang-fr">Carte touristique</span>
+                <span class="lang-en">Tourist Map</span>
+            </a>
+            <a href="#services" class="dropdown-item">
+                <i class="fas fa-concierge-bell"></i>
+                <span class="lang-ar">خدماتي</span>
+                <span class="lang-fr">Mes services</span>
+                <span class="lang-en">My Services</span>
+            </a>
+            <a href="#offers" class="dropdown-item">
+                <i class="fas fa-gift"></i>
+                <span class="lang-ar">العروض</span>
+                <span class="lang-fr">Offres</span>
+                                <span class="lang-en">Offers</span>
+            </a>
+            <a href="#settings" class="dropdown-item">
+                <i class="fas fa-cog"></i>
+                <span class="lang-ar">الإعدادات</span>
+                <span class="lang-fr">Paramètres</span>
+                <span class="lang-en">Settings</span>
+            </a>
+            <div class="dropdown-item" id="logoutBtn" style="color: #dc3545;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="lang-ar">تسجيل الخروج</span>
+                <span class="lang-fr">Déconnexion</span>
+                <span class="lang-en">Logout</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- التخطيط الرئيسي -->
+    <div class="main-layout">
+        <!-- القائمة الجانبية للكمبيوتر -->
+        <aside class="sidebar-desktop">
+            <div class="sidebar-content">
+                <!-- ملف تعريف السائح -->
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        س
+                    </div>
+                    <h3 class="user-name">سياحي</h3>
+                    <p class="user-email">tourist@algeriatouristpass.com</p>
+                    <p class="user-email">رقم العضوية: ALG-2024-78945</p>
+                    <span class="user-status">
+                        <span class="lang-ar">نشط</span>
+                        <span class="lang-fr">Actif</span>
+                        <span class="lang-en">Active</span>
+                    </span>
+                </div>
+                
+                <!-- القائمة الجانبية -->
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="#dashboard" class="menu-link active">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="lang-ar">لوحة التحكم</span>
+                            <span class="lang-fr">Tableau de bord</span>
+                            <span class="lang-en">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#card" class="menu-link">
+                            <i class="fas fa-credit-card"></i>
+                            <span class="lang-ar">بطاقتي</span>
+                            <span class="lang-fr">Ma carte</span>
+                            <span class="lang-en">My Card</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#balance" class="menu-link">
+                            <i class="fas fa-wallet"></i>
+                            <span class="lang-ar">رصيدي</span>
+                            <span class="lang-fr">Mon solde</span>
+                            <span class="lang-en">My Balance</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#transactions" class="menu-link">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span class="lang-ar">عملياتي</span>
+                            <span class="lang-fr">Mes transactions</span>
+                            <span class="lang-en">My Transactions</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#map" class="menu-link">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span class="lang-ar">الخريطة السياحية</span>
+                            <span class="lang-fr">Carte touristique</span>
+                            <span class="lang-en">Tourist Map</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#services" class="menu-link">
+                            <i class="fas fa-concierge-bell"></i>
+                            <span class="lang-ar">خدماتي</span>
+                            <span class="lang-fr">Mes services</span>
+                            <span class="lang-en">My Services</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#offers" class="menu-link">
+                            <i class="fas fa-gift"></i>
+                            <span class="lang-ar">العروض</span>
+                            <span class="lang-fr">Offres</span>
+                            <span class="lang-en">Offers</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#settings" class="menu-link">
+                            <i class="fas fa-cog"></i>
+                            <span class="lang-ar">الإعدادات</span>
+                            <span class="lang-fr">Paramètres</span>
+                            <span class="lang-en">Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- قسم النظرة العامة -->
+            <section id="dashboard" class="dashboard-section">
+                <div class="welcome-section">
+                    <h1 class="lang-ar">مرحباً، سياحي!</h1>
+                    <h1 class="lang-fr">Bonjour, Touriste!</h1>
+                    <h1 class="lang-en">Hello, Tourist!</h1>
+                    
+                    <p class="lang-ar">نتمنى لك رحلة سياحية ممتعة في الجزائر</p>
+                    <p class="lang-fr">Nous vous souhaitons un agréable voyage touristique en Algérie</p>
+                    <p class="lang-en">We wish you an enjoyable tourist journey in Algeria</p>
+                </div>
+                
+                <!-- بطاقة مصغرة في لوحة التحكم -->
+                <div class="card-mini-section">
+                    <h3 class="card-mini-title">
+                        <i class="fas fa-credit-card"></i>
+                        <span class="lang-ar">بطاقتي السياحية</span>
+                        <span class="lang-fr">Ma carte touristique</span>
+                        <span class="lang-en">My Tourist Card</span>
+                    </h3>
+                    <img id="cardMiniImage" class="card-mini-image" alt="Pass Algeria Tourist Card">
+                    <div id="cardMiniPlaceholder" class="card-mini-placeholder" style="display: none;">
+                        <i class="fas fa-credit-card"></i>
+                        <div class="lang-ar">بطاقة Pass Algeria Tourist</div>
+                        <div class="lang-fr">Carte Pass Algeria Tourist</div>
+                        <div class="lang-en">Pass Algeria Tourist Card</div>
+                    </div>
+                    <p style="margin-top: 15px; color: var(--gray); font-size: 0.9rem;">
+                        <span class="lang-ar">رقم البطاقة: 4712 3568 9012 7890</span>
+                        <span class="lang-fr">Numéro de carte: 4712 3568 9012 7890</span>
+                        <span class="lang-en">Card Number: 4712 3568 9012 7890</span>
+                    </p>
+                </div>
+                
+                <!-- إحصائيات سريعة -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: rgba(26, 156, 156, 0.1); color: var(--primary);">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="lang-ar">الرصيد الحالي</h3>
+                            <h3 class="lang-fr">Solde actuel</h3>
+                            <h3 class="lang-en">Current Balance</h3>
+                            <div class="stat-value">7,500 <span style="font-size: 1rem;">دج</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: rgba(212, 175, 55, 0.1); color: var(--secondary);">
+                            <i class="fas fa-concierge-bell"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="lang-ar">الخدمات المستخدمة</h3>
+                            <h3 class="lang-fr">Services utilisés</h3>
+                            <h3 class="lang-en">Services Used</h3>
+                            <div class="stat-value">12</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: rgba(40, 167, 69, 0.1); color: var(--success);">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="lang-ar">الأيام المتبقية</h3>
+                            <h3 class="lang-fr">Jours restants</h3>
+                            <h3 class="lang-en">Days Remaining</h3>
+                            <div class="stat-value">45</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: rgba(255, 193, 7, 0.1); color: var(--warning);">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="lang-ar">إجمالي الإنفاق</h3>
+                            <h3 class="lang-fr">Dépenses totales</h3>
+                            <h3 class="lang-en">Total Spending</h3>
+                            <div class="stat-value">23,500 <span style="font-size: 1rem;">دج</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- بطاقتي -->
+            <section id="card" class="card-display-section" style="display: none;">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-credit-card"></i>
+                        <span class="lang-ar">بطاقتي</span>
+                        <span class="lang-fr">Ma carte</span>
+                        <span class="lang-en">My Card</span>
+                    </h2>
+                </div>
+                
+                <div class="card-preview">
+                    <!-- صورة البطاقة كاملة -->
+                    <div class="card-image-container">
+                        <img id="cardFullImage" class="card-image" alt="Pass Algeria Tourist Card">
+                        <div id="cardFullPlaceholder" class="card-placeholder" style="display: none;">
+                            <i class="fas fa-credit-card"></i>
+                            <div class="lang-ar">بطاقة Pass Algeria Tourist</div>
+                            <div class="lang-fr">Carte Pass Algeria Tourist</div>
+                            <div class="lang-en">Pass Algeria Tourist Card</div>
+                            <p style="font-size: 1rem; margin-top: 10px; opacity: 0.8;">
+                                <span class="lang-ar">رقم البطاقة: 4712 3568 9012 7890</span>
+                                <span class="lang-fr">Numéro de carte: 4712 3568 9012 7890</span>
+                                <span class="lang-en">Card Number: 4712 3568 9012 7890</span>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- تفاصيل البطاقة -->
+                    <div class="card-info">
+                        <div class="card-info-item">
+                            <div class="card-info-label lang-ar">اسم حامل البطاقة</div>
+                            <div class="card-info-label lang-fr">Nom du titulaire</div>
+                            <div class="card-info-label lang-en">Card Holder Name</div>
+                            <div class="card-info-value">سياحي</div>
+                        </div>
+                        <div class="card-info-item">
+                            <div class="card-info-label lang-ar">رقم البطاقة</div>
+                            <div class="card-info-label lang-fr">Numéro de carte</div>
+                            <div class="card-info-label lang-en">Card Number</div>
+                            <div class="card-info-value">4712 3568 9012 7890</div>
+                        </div>
+                        <div class="card-info-item">
+                            <div class="card-info-label lang-ar">تاريخ الانتهاء</div>
+                            <div class="card-info-label lang-fr">Date d'expiration</div>
+                            <div class="card-info-label lang-en">Expiry Date</div>
+                            <div class="card-info-value">12/2027</div>
+                        </div>
+                        <div class="card-info-item">
+                            <div class="card-info-label lang-ar">رمز CVV</div>
+                            <div class="card-info-label lang-fr">Code CVV</div>
+                            <div class="card-info-label lang-en">CVV Code</div>
+                            <div class="card-info-value">123</div>
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code -->
+                    <div class="qr-code">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    
+                    <!-- إجراءات البطاقة -->
+                    <div class="section-actions">
+                        <button class="btn btn-outline" id="reportCardBtn">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span class="lang-ar">إبلاغ عن فقدان</span>
+                            <span class="lang-fr">Signaler une perte</span>
+                            <span class="lang-en">Report Loss</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم الرصيد والشحن -->
+            <section id="balance" class="balance-section" style="display: none;">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-wallet"></i>
+                        <span class="lang-ar">رصيدي وشحن البطاقة</span>
+                        <span class="lang-fr">Mon solde et recharge</span>
+                        <span class="lang-en">My Balance & Recharge</span>
+                    </h2>
+                </div>
+                
+                <div class="current-balance">
+                    <div class="balance-label lang-ar">الرصيد الحالي</div>
+                    <div class="balance-label lang-fr">Solde actuel</div>
+                    <div class="balance-label lang-en">Current Balance</div>
+                    <div class="balance-amount">7,500 <span class="currency">دج</span></div>
+                </div>
+                
+                <div class="custom-recharge">
+                    <h3 class="lang-ar" style="margin-bottom: 20px; color: var(--dark);">شحن البطاقة</h3>
+                    <h3 class="lang-fr" style="margin-bottom: 20px; color: var(--dark);">Recharger la carte</h3>
+                    <h3 class="lang-en" style="margin-bottom: 20px; color: var(--dark);">Card Recharge</h3>
+                    
+                    <div class="form-group">
+                        <label for="customAmount" class="lang-ar">المبلغ (دينار جزائري)</label>
+                        <label for="customAmount" class="lang-fr">Montant (Dinar algérien)</label>
+                        <label for="customAmount" class="lang-en">Amount (Algerian Dinar)</label>
+                        <input type="number" id="customAmount" class="form-control" placeholder="أدخل المبلغ" min="1000" max="100000">
+                    </div>
+                </div>
+                
+                <div class="payment-methods-section">
+                    <h3 class="lang-ar" style="margin-bottom: 20px; color: var(--dark);">طريقة الدفع</h3>
+                    <h3 class="lang-fr" style="margin-bottom: 20px; color: var(--dark);">Méthode de paiement</h3>
+                    <h3 class="lang-en" style="margin-bottom: 20px; color: var(--dark);">Payment Method</h3>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method selected" data-method="visa">
+                            <div class="payment-icon">
+                                <i class="fab fa-cc-visa"></i>
+                            </div>
+                            <div class="lang-ar">فيزا</div>
+                            <div class="lang-fr">Visa</div>
+                            <div class="lang-en">Visa</div>
+                        </div>
+                        <div class="payment-method" data-method="mastercard">
+                            <div class="payment-icon">
+                                <i class="fab fa-cc-mastercard"></i>
+                            </div>
+                            <div class="lang-ar">ماستركارد</div>
+                            <div class="lang-fr">Mastercard</div>
+                            <div class="lang-en">Mastercard</div>
+                        </div>
+                        <div class="payment-method" data-method="paypal">
+                            <div class="payment-icon">
+                                <i class="fab fa-paypal"></i>
+                            </div>
+                            <div class="lang-ar">PayPal</div>
+                            <div class="lang-fr">PayPal</div>
+                            <div class="lang-en">PayPal</div>
+                        </div>
+                        <div class="payment-method" data-method="applepay">
+                            <div class="payment-icon">
+                                <i class="fab fa-apple-pay"></i>
+                            </div>
+                            <div class="lang-ar">Apple Pay</div>
+                            <div class="lang-fr">Apple Pay</div>
+                            <div class="lang-en">Apple Pay</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="rechargeBtn" style="width: 100%; padding: 16px; font-size: 1.1rem; margin-top: 20px;">
+                    <i class="fas fa-bolt"></i>
+                    <span class="lang-ar">شحن البطاقة الآن</span>
+                    <span class="lang-fr">Recharger la carte maintenant</span>
+                    <span class="lang-en">Recharge Card Now</span>
+                </button>
+            </section>
+            
+            <!-- قسم العمليات -->
+            <section id="transactions" class="transactions-section" style="display: none;">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-exchange-alt"></i>
+                        <span class="lang-ar">عملياتي</span>
+                        <span class="lang-fr">Mes transactions</span>
+                        <span class="lang-en">My Transactions</span>
+                    </h2>
+                </div>
+                
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">
+                        <span class="lang-ar">الكل</span>
+                        <span class="lang-fr">Tous</span>
+                        <span class="lang-en">All</span>
+                    </button>
+                    <button class="filter-btn" data-filter="today">
+                        <span class="lang-ar">اليوم</span>
+                        <span class="lang-fr">Aujourd'hui</span>
+                        <span class="lang-en">Today</span>
+                    </button>
+                    <button class="filter-btn" data-filter="week">
+                        <span class="lang-ar">هذا الأسبوع</span>
+                        <span class="lang-fr">Cette semaine</span>
+                        <span class="lang-en">This Week</span>
+                    </button>
+                    <button class="filter-btn" data-filter="month">
+                        <span class="lang-ar">هذا الشهر</span>
+                        <span class="lang-fr">Ce mois</span>
+                        <span class="lang-en">This Month</span>
+                    </button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" placeholder="البحث في العمليات...">
+                    <i class="fas fa-search"></i>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="lang-ar">التاريخ</th>
+                                <th class="lang-fr">Date</th>
+                                <th class="lang-en">Date</th>
+                                <th class="lang-ar">المكان</th>
+                                <th class="lang-fr">Lieu</th>
+                                <th class="lang-en">Place</th>
+                                <th class="lang-ar">المبلغ</th>
+                                <th class="lang-fr">Montant</th>
+                                <th class="lang-en">Amount</th>
+                                <th class="lang-ar">الحالة</th>
+                                <th class="lang-fr">Statut</th>
+                                <th class="lang-en">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTable">
+                            <!-- سيتم ملؤها بالجافاسكريبت -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- قسم الخريطة السياحية -->
+            <section id="map" class="map-section" style="display: none;">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span class="lang-ar">الخريطة السياحية للجزائر</span>
+                        <span class="lang-fr">Carte touristique de l'Algérie</span>
+                        <span class="lang-en">Algeria Tourist Map</span>
+                    </h2>
+                </div>
+                
+                <div class="map-controls">
+                    <div class="map-filter active" data-type="all">
+                        <i class="fas fa-layer-group"></i>
+                        <span class="lang-ar">الكل</span>
+                        <span class="lang-fr">Tous</span>
+                        <span class="lang-en">All</span>
+                    </div>
+                    <div class="map-filter" data-type="hotel">
+                        <i class="fas fa-hotel"></i>
+                        <span class="lang-ar">فنادق</span>
+                        <span class="lang-fr">Hôtels</span>
+                        <span class="lang-en">Hotels</span>
+                    </div>
+                    <div class="map-filter" data-type="restaurant">
+                        <i class="fas fa-utensils"></i>
+                        <span class="lang-ar">مطاعم</span>
+                        <span class="lang-fr">Restaurants</span>
+                        <span class="lang-en">Restaurants</span>
+                    </div>
+                    <div class="map-filter" data-type="museum">
+                        <i class="fas fa-landmark"></i>
+                        <span class="lang-ar">متاحف</span>
+                        <span class="lang-fr">Musées</span>
+                        <span class="lang-en">Museums</span>
+                    </div>
+                    <div class="map-filter" data-type="activity">
+                        <i class="fas fa-hiking"></i>
+                        <span class="lang-ar">أنشطة</span>
+                        <span class="lang-fr">Activités</span>
+                        <span class="lang-en">Activities</span>
+                    </div>
+                </div>
+                
+                <div id="mapContainer" class="map-container"></div>
+            </section>
+            
+            <!-- قسم الخدمات -->
+            <section id="services" class="services-section" style="display: none;">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-concierge-bell"></i>
+                        <span class="lang-ar">خدماتي المستخدمة</span>
+                        <span class="lang-fr">Mes services utilisés</span>
+                        <span class="lang-en">My Used Services</span>
+                    </h2>
+                </div>
+                
+                <div class="services-tabs">
+                    <button class="tab-btn active" data-service="all">
+                        <span class="lang-ar">الكل</span>
+                        <span class="lang-fr">Tous</span>
+                        <span class="lang-en">All</span>
+                    </button>
+                    <button class="tab-btn" data-service="hotel">
+                        <i class="fas fa-hotel"></i>
+                        <span class="lang-ar">الإقامة</span>
+                        <span class="lang-fr">Hébergement</span>
+                        <span class="lang-en">Accommodation</span>
+                    </button>
+                    <button class="tab-btn" data-service="restaurant">
+                        <i class="fas fa-utensils"></i>
+                        <span class="lang-ar">مطاعم</span>
+                        <span class="lang-fr">Restaurants</span>
+                        <span class="lang-en">Restaurants</span>
+                    </button>
+                    <button class="tab-btn" data-service="activity">
+                        <i class="fas fa-hiking"></i>
+                        <span class="lang-ar">أنشطة</span>
+                        <span class="lang-fr">Activités</span>
+                        <span class="lang-en">Activities</span>
+                    </button>
+                </div>
+                
+                <div class="services-list" id="servicesList">
+                    <!-- سيتم ملؤها بالجافاسكريبت -->
+                </div>
+            </section>
+            
+            <!-- قسم العروض -->
+            <section id="offers" class="offers-section" style="display: none;">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-gift"></i>
+                        <span class="lang-ar">العروض الحصرية</span>
+                        <span class="lang-fr">Offres exclusives</span>
+                        <span class="lang-en">Exclusive Offers</span>
+                    </h2>
+                </div>
+                
+                <div class="offers-grid">
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <div class="offer-badge">-20%</div>
+                            <div class="offer-title lang-ar">خصم على الفنادق</div>
+                            <div class="offer-title lang-fr">Réduction sur les hôtels</div>
+                            <div class="offer-title lang-en">Hotel Discount</div>
+                        </div>
+                        <div class="offer-body">
+                            <p class="offer-desc lang-ar">احصل على خصم 20% على إقامتك في فنادق الجزائر العاصمة الشريكة</p>
+                            <p class="offer-desc lang-fr">Obtenez 20% de réduction sur votre séjour dans les hôtels partenaires d'Alger</p>
+                            <p class="offer-desc lang-en">Get 20% discount on your stay at partner hotels in Algiers</p>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <div class="offer-badge">مجاني</div>
+                            <div class="offer-title lang-ar">دخول مجاني للمتاحف</div>
+                            <div class="offer-title lang-fr">Entrée gratuite aux musées</div>
+                            <div class="offer-title lang-en">Free Museum Entry</div>
+                        </div>
+                        <div class="offer-body">
+                            <p class="offer-desc lang-ar">دخول مجاني لجميع المتاحف الوطنية خلال شهر ديسمبر</p>
+                            <p class="offer-desc lang-fr">Entrée gratuite à tous les musées nationaux durant le mois de décembre</p>
+                            <p class="offer-desc lang-en">Free entry to all national museums during December</p>
+
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="offer-card">
+                        <div class="offer-header">
+                            <div class="offer-badge">هدية</div>
+                            <div class="offer-title lang-ar">وجبة مجانية</div>
+                            <div class="offer-title lang-fr">Repas gratuit</div>
+                            <div class="offer-title lang-en">Free Meal</div>
+                        </div>
+                        <div class="offer-body">
+                            <p class="offer-desc lang-ar">احصل على وجبة مجانية عند شرائك وجبتين في مطاعمنا الشريكة</p>
+                            <p class="offer-desc lang-fr">Obtenez un repas gratuit lorsque vous achetez deux repas dans nos restaurants partenaires</p>
+                            <p class="offer-desc lang-en">Get a free meal when you buy two meals at our partner restaurants</p>
+
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- قسم الإعدادات -->
+            <section id="settings" class="settings-section" style="display: none;">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-cog"></i>
+                        <span class="lang-ar">الإعدادات</span>
+                        <span class="lang-fr">Paramètres</span>
+                        <span class="lang-en">Settings</span>
+                    </h2>
+                </div>
+                
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-setting="personal">
+                        <span class="lang-ar">المعلومات الشخصية</span>
+                        <span class="lang-fr">Informations personnelles</span>
+                        <span class="lang-en">Personal Information</span>
+                    </button>
+                    <button class="tab-btn" data-setting="security">
+                        <span class="lang-ar">الأمان</span>
+                        <span class="lang-fr">Sécurité</span>
+                        <span class="lang-en">Security</span>
+                    </button>
+                    <button class="tab-btn" data-setting="preferences">
+                        <span class="lang-ar">التفضيلات</span>
+                        <span class="lang-fr">Préférences</span>
+                        <span class="lang-en">Preferences</span>
+                    </button>
+                </div>
+                
+                <div id="personalSettings" class="settings-content">
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label for="fullName" class="lang-ar">الاسم الكامل</label>
+                            <label for="fullName" class="lang-fr">Nom complet</label>
+                            <label for="fullName" class="lang-en">Full Name</label>
+                            <input type="text" id="fullName" class="form-control" value="سياحي">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="lang-ar">البريد الإلكتروني</label>
+                            <label for="email" class="lang-fr">Adresse e-mail</label>
+                            <label for="email" class="lang-en">Email Address</label>
+                            <input type="email" id="email" class="form-control" value="tourist@algeriatouristpass.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone" class="lang-ar">رقم الهاتف</label>
+                            <label for="phone" class="lang-fr">Numéro de téléphone</label>
+                            <label for="phone" class="lang-en">Phone Number</label>
+                            <input type="tel" id="phone" class="form-control" value="+213 799 521 634">
+                        </div>
+                        
+                        <button class="btn btn-primary" id="savePersonalBtn" style="width: 100%; padding: 14px;">
+                            <i class="fas fa-save"></i>
+                            <span class="lang-ar">حفظ التغييرات</span>
+                            <span class="lang-fr">Enregistrer les modifications</span>
+                            <span class="lang-en">Save Changes</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="securitySettings" class="settings-content" style="display: none;">
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label for="currentPassword" class="lang-ar">كلمة المرور الحالية</label>
+                            <label for="currentPassword" class="lang-fr">Mot de passe actuel</label>
+                            <label for="currentPassword" class="lang-en">Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword" class="lang-ar">كلمة المرور الجديدة</label>
+                            <label for="newPassword" class="lang-fr">Nouveau mot de passe</label>
+                            <label for="newPassword" class="lang-en">New Password</label>
+                            <input type="password" id="newPassword" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword" class="lang-ar">تأكيد كلمة المرور</label>
+                            <label for="confirmPassword" class="lang-fr">Confirmer le mot de passe</label>
+                            <label for="confirmPassword" class="lang-en">Confirm Password</label>
+                            <input type="password" id="confirmPassword" class="form-control">
+                        </div>
+                        
+                        <div class="toggle-switch">
+                            <div class="toggle-label">
+                                <span class="lang-ar">المصادقة الثنائية</span>
+                                <span class="lang-fr">Authentification à deux facteurs</span>
+                                <span class="lang-en">Two-Factor Authentication</span>
+                                <small class="lang-ar">توفر طبقة إضافية من الأمان</small>
+                                <small class="lang-fr">Fournit une couche supplémentaire de sécurité</small>
+                                <small class="lang-en">Provides an extra layer of security</small>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="twoFactorToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="saveSecurityBtn" style="width: 100%; padding: 14px;">
+                            <i class="fas fa-save"></i>
+                            <span class="lang-ar">تحديث الأمان</span>
+                            <span class="lang-fr">Mettre à jour la sécurité</span>
+                            <span class="lang-en">Update Security</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="preferencesSettings" class="settings-content" style="display: none;">
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label for="languagePref" class="lang-ar">اللغة المفضلة</label>
+                            <label for="languagePref" class="lang-fr">Langue préférée</label>
+                            <label for="languagePref" class="lang-en">Preferred Language</label>
+                            <select id="languagePref" class="form-control">
+                                <option value="ar">العربية</option>
+                                <option value="fr">Français</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                        
+                        <div class="toggle-switch">
+                            <div class="toggle-label">
+                                <span class="lang-ar">إشعارات البريد الإلكتروني</span>
+                                <span class="lang-fr">Notifications par e-mail</span>
+                                <span class="lang-en">Email Notifications</span>
+                                <small class="lang-ar">تلقي تحديثات حول حسابك</small>
+                                <small class="lang-fr">Recevoir des mises à jour sur votre compte</small>
+                                <small class="lang-en">Receive updates about your account</small>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="emailNotifications" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="toggle-switch">
+                            <div class="toggle-label">
+                                <span class="lang-ar">إشعارات SMS</span>
+                                <span class="lang-fr">Notifications SMS</span>
+                                <span class="lang-en">SMS Notifications</span>
+                                <small class="lang-ar">تلقي تنبيهات عبر الرسائل النصية</small>
+                                <small class="lang-fr">Recevoir des alertes par SMS</small>
+                                <small class="lang-en">Receive alerts via SMS</small>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="smsNotifications" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="toggle-switch">
+                            <div class="toggle-label">
+                                <span class="lang-ar">العروض الترويجية</span>
+                                <span class="lang-fr">Offres promotionnelles</span>
+                                <span class="lang-en">Promotional Offers</span>
+                                <small class="lang-ar">تلقي عروض خاصة وخصومات</small>
+                                <small class="lang-fr">Recevoir des offres spéciales et réductions</small>
+                                <small class="lang-en">Receive special offers and discounts</small>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="promotionalOffers" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="savePreferencesBtn" style="width: 100%; padding: 14px;">
+                            <i class="fas fa-save"></i>
+                            <span class="lang-ar">حفظ التفضيلات</span>
+                            <span class="lang-fr">Enregistrer les préférences</span>
+                            <span class="lang-en">Save Preferences</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- الفوتر -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>Pass Algeria Tourist</h3>
+                <p class="lang-ar">لوحة تحكم السائح - تجربة سياحية ذكية في الجزائر</p>
+                <p class="lang-fr">Tableau de bord touristique - Expérience touristique intelligente en Algérie</p>
+                <p class="lang-en">Tourist Dashboard - Smart tourist experience in Algeria</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4 class="lang-ar">روابط سريعة</h4>
+                <h4 class="lang-fr">Liens rapides</h4>
+                <h4 class="lang-en">Quick Links</h4>
+                <ul>
+                    <li><a href="#dashboard" class="footer-nav">
+                        <span class="lang-ar">لوحة التحكم</span>
+                        <span class="lang-fr">Tableau de bord</span>
+                        <span class="lang-en">Dashboard</span>
+                    </a></li>
+                    <li><a href="#balance" class="footer-nav">
+                        <span class="lang-ar">شحن الرصيد</span>
+                        <span class="lang-fr">Recharge</span>
+                        <span class="lang-en">Recharge</span>
+                    </a></li>
+                    <li><a href="#map" class="footer-nav">
+                        <span class="lang-ar">الخريطة</span>
+                        <span class="lang-fr">Carte</span>
+                        <span class="lang-en">Map</span>
+                    </a></li>
+                    <li><a href="#offers" class="footer-nav">
+                        <span class="lang-ar">العروض</span>
+                        <span class="lang-fr">Offres</span>
+                        <span class="lang-en">Offers</span>
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h4 class="lang-ar">الدعم</h4>
+                <h4 class="lang-fr">Support</h4>
+                <h4 class="lang-en">Support</h4>
+                <ul>
+                    <li><a href="#">
+                        <span class="lang-ar">مركز المساعدة</span>
+                        <span class="lang-fr">Centre d'aide</span>
+                        <span class="lang-en">Help Center</span>
+                    </a></li>
+                    <li><a href="#">
+                        <span class="lang-ar">اتصل بنا</span>
+                        <span class="lang-fr">Contactez-nous</span>
+                        <span class="lang-en">Contact Us</span>
+                    </a></li>
+                    <li><a href="#">
+                        <span class="lang-ar">الأسئلة الشائعة</span>
+                        <span class="lang-fr">FAQ</span>
+                        <span class="lang-en">FAQ</span>
+                    </a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-contact">
+                <h4 class="lang-ar">معلومات الاتصال</h4>
+                <h4 class="lang-fr">Informations de contact</h4>
+                <h4 class="lang-en">Contact Information</h4>
+                
+                <p><i class="fas fa-phone"></i> +213 21 23 45 678</p>
+                <p><i class="fas fa-envelope"></i> support@algeriatouristpass.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> الجزائر العاصمة، الجزائر</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p id="copyrightText"></p>
+        </div>
+    </footer>
+
+    <!-- مكتبة Leaflet للخريطة -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- JavaScript مدمج -->
+    <script>
+        // ===== JavaScript: لوحة تحكم السائح =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // === متغيرات التطبيق ===
+            let currentBalance = 7500;
+            let transactions = [];
+            let services = [];
+            let currentSection = 'dashboard';
+            let map = null;
+            let markers = [];
+            
+            // === تحديث السنة في الفوتر ===
+            function updateCopyrightYear() {
+                const currentYear = new Date().getFullYear();
+                const copyrightText = document.getElementById('copyrightText');
+                const currentLang = document.body.getAttribute('data-lang');
+                
+                let text = '';
+                if(currentLang === 'ar') {
+                    text = `© ${currentYear} Pass Algeria Tourist – جميع الحقوق محفوظة.`;
+                } else if(currentLang === 'fr') {
+                    text = `© ${currentYear} Pass Algeria Tourist – Tous droits réservés.`;
+                } else {
+                    text = `© ${currentYear} Pass Algeria Tourist – All rights reserved.`;
+                }
+                
+                copyrightText.innerHTML = text;
+            }
+            
+            // === تهيئة البيانات الوهمية ===
+            function initMockData() {
+                // بيانات العمليات
+                transactions = [
+                    {
+                        id: 1,
+                        date: '2024-03-15 14:30',
+                        place: 'فندق الجزائر العاصمة',
+                        service: 'الإقامة',
+                        amount: 4500,
+                        status: 'success',
+                        code: 'TXN-789456'
+                    },
+                    {
+                        id: 2,
+                        date: '2024-03-14 19:15',
+                        place: 'مطعم القصبة',
+                        service: 'مطعم',
+                        amount: 2500,
+                        status: 'success',
+                        code: 'TXN-789457'
+                    },
+                    {
+                        id: 3,
+                        date: '2024-03-13 10:00',
+                        place: 'المتحف الوطني',
+                        service: 'متحف',
+                        amount: 800,
+                        status: 'success',
+                        code: 'TXN-789458'
+                    },
+                    {
+                        id: 4,
+                        date: '2024-03-12 16:45',
+                        place: 'حافلة سياحية',
+                        service: 'نقل',
+                        amount: 1200,
+                        status: 'pending',
+                        code: 'TXN-789459'
+                    },
+                    {
+                        id: 5,
+                        date: '2024-03-11 09:30',
+                        place: 'رحلة الصحراء',
+                        service: 'نشاط',
+                        amount: 3500,
+                        status: 'success',
+                        code: 'TXN-789460'
+                    },
+                    {
+                        id: 6,
+                        date: '2024-03-10 20:00',
+                        place: 'فندق وهران',
+                        service: 'الإقامة',
+                        amount: 3800,
+                        status: 'success',
+                        code: 'TXN-789461'
+                    }
+                ];
+                
+                // بيانات الخدمات
+                services = [
+                    {
+                        id: 1,
+                        type: 'hotel',
+                        name: 'فندق الجزائر العاصمة',
+                        date: '2024-03-15',
+                        rating: 4.5,
+                        description: 'إقامة لمدة ليلتين'
+                    },
+                    {
+                        id: 2,
+                        type: 'restaurant',
+                        name: 'مطعم القصبة',
+                        date: '2024-03-14',
+                        rating: 4.0,
+                        description: 'عشاء تقليدي جزائري'
+                    },
+                    {
+                        id: 3,
+                        type: 'museum',
+                        name: 'المتحف الوطني',
+                        date: '2024-03-13',
+                        rating: 5.0,
+                        description: 'جولة في المتحف الوطني'
+                    },
+                    {
+                        id: 4,
+                        type: 'activity',
+                        name: 'رحلة الصحراء',
+                        date: '2024-03-11',
+                        rating: 4.8,
+                        description: 'رحلة سفاري لمدة يوم'
+                    }
+                ];
+            }
+            
+            // === تحميل صورة البطاقة ===
+            function loadCardImages() {
+                const cardMiniImage = document.getElementById('cardMiniImage');
+                const cardMiniPlaceholder = document.getElementById('cardMiniPlaceholder');
+                const cardFullImage = document.getElementById('cardFullImage');
+                const cardFullPlaceholder = document.getElementById('cardFullPlaceholder');
+                
+                // تحميل الصورة المصغرة
+                const miniImg = new Image();
+                miniImg.onload = function() {
+                    cardMiniImage.style.display = 'block';
+                    cardMiniPlaceholder.style.display = 'none';
+                };
+                miniImg.onerror = function() {
+                    cardMiniImage.style.display = 'none';
+                    cardMiniPlaceholder.style.display = 'flex';
+                };
+                miniImg.src = 'card.png';
+                miniImg.alt = 'Pass Algeria Tourist Card';
+                
+                // تحميل الصورة الكاملة
+                const fullImg = new Image();
+                fullImg.onload = function() {
+                    cardFullImage.style.display = 'block';
+                    cardFullPlaceholder.style.display = 'none';
+                };
+                fullImg.onerror = function() {
+                    cardFullImage.style.display = 'none';
+                    cardFullPlaceholder.style.display = 'flex';
+                };
+                fullImg.src = 'card.png';
+                fullImg.alt = 'Pass Algeria Tourist Card';
+                
+                // إضافة الصور إلى DOM
+                cardMiniImage.src = 'card.png';
+                cardFullImage.src = 'card.png';
+            }
+            
+            // === نظام اللغة ===
+            const currentFlag = document.getElementById('currentFlag');
+            const languageOptions = document.getElementById('languageOptions');
+            const languageOptionsList = document.querySelectorAll('.language-option');
+            
+            currentFlag.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageOptions.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', function() {
+                languageOptions.classList.remove('show');
+            });
+            
+            languageOptions.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            languageOptionsList.forEach(option => {
+                option.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    
+                    document.body.setAttribute('data-lang', lang);
+                    
+                    const flagClass = this.className.split(' ')[1];
+                    currentFlag.className = 'current-flag ' + flagClass;
+                    currentFlag.setAttribute('title', this.getAttribute('title'));
+                    
+                    localStorage.setItem('preferredLang', lang);
+                    languageOptions.classList.remove('show');
+                    updateCopyrightYear();
+                });
+            });
+            
+            // تحميل اللغة المفضلة
+            const savedLang = localStorage.getItem('preferredLang') || 'ar';
+            document.body.setAttribute('data-lang', savedLang);
+            
+            if(savedLang === 'ar') {
+                currentFlag.className = 'current-flag flag-ar';
+                currentFlag.title = 'العربية';
+            } else if(savedLang === 'fr') {
+                currentFlag.className = 'current-flag flag-fr';
+                currentFlag.title = 'Français';
+            } else {
+                currentFlag.className = 'current-flag flag-en';
+                currentFlag.title = 'English';
+            }
+            
+            // === القائمة المنسدلة الرئيسية ===
+            const menuBtn = document.getElementById('menuBtn');
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            const userIcon = document.getElementById('userIcon');
+            
+            menuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+            });
+            
+            // أيقونة الحساب تذهب للإعدادات
+            userIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                showSection('settings');
+                dropdownMenu.classList.remove('show');
+            });
+            
+            // إغلاق القائمة عند النقر خارجها
+            document.addEventListener('click', function(e) {
+                if(!dropdownMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                }
+            });
+            
+            // === زر تسجيل الخروج ===
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                const currentLang = document.body.getAttribute('data-lang');
+                let message = '';
+                
+                if(currentLang === 'ar') {
+                    message = 'هل أنت متأكد من تسجيل الخروج؟';
+                } else if(currentLang === 'fr') {
+                    message = 'Êtes-vous sûr de vouloir vous déconnecter ?';
+                } else {
+                    message = 'Are you sure you want to logout?';
+                }
+                
+                if(confirm(message)) {
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('userEmail');
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // === التنقل في القائمة ===
+            const dropdownItems = document.querySelectorAll('.dropdown-item');
+            const footerNavs = document.querySelectorAll('.footer-nav');
+            const sidebarLinks = document.querySelectorAll('.sidebar-desktop .menu-link');
+            
+            // دالة للتنقل
+            function navigateToSection(sectionId, event = null) {
+                if(event) event.preventDefault();
+                
+                // إغلاق القائمة المنسدلة
+                dropdownMenu.classList.remove('show');
+                
+                // تحديث القائمة الجانبية للكمبيوتر
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if(link.getAttribute('href') === '#' + sectionId) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                // تحديث القائمة المنسدلة
+                dropdownItems.forEach(item => {
+                    if(item.getAttribute('href') === '#' + sectionId) {
+                        item.style.backgroundColor = 'var(--light)';
+                    } else {
+                        item.style.backgroundColor = '';
+                    }
+                });
+                
+                showSection(sectionId);
+            }
+            
+            // إضافة مستمعي الأحداث
+            dropdownItems.forEach(item => {
+                if(item.id !== 'logoutBtn') {
+                    item.addEventListener('click', function(e) {
+                        const sectionId = this.getAttribute('href').substring(1);
+                        navigateToSection(sectionId, e);
+                    });
+                }
+            });
+            
+            footerNavs.forEach(nav => {
+                nav.addEventListener('click', function(e) {
+                    const sectionId = this.getAttribute('href').substring(1);
+                    navigateToSection(sectionId, e);
+                });
+            });
+            
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const sectionId = this.getAttribute('href').substring(1);
+                    navigateToSection(sectionId, e);
+                });
+            });
+            
+            // === عرض الأقسام ===
+            function showSection(sectionId) {
+                // إخفاء جميع الأقسام
+                document.querySelectorAll('.main-content > section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // عرض القسم المطلوب
+                const targetSection = document.getElementById(sectionId);
+                if(targetSection) {
+                    targetSection.style.display = 'block';
+                    currentSection = sectionId;
+                    
+                    // تحديث محتوى القسم إذا لزم الأمر
+                    if(sectionId === 'transactions') {
+                        updateTransactionsTable();
+                    } else if(sectionId === 'services') {
+                        updateServicesList();
+                    } else if(sectionId === 'map') {
+                        initMap();
+                    }
+                    
+                    // التمرير للأعلى
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+            
+            // === تحديث جدول العمليات ===
+            function updateTransactionsTable(filter = 'all') {
+                const tableBody = document.getElementById('transactionsTable');
+                const currentLang = document.body.getAttribute('data-lang');
+                
+                let filteredTransactions = [...transactions];
+                
+                if(filter === 'today') {
+                    const today = new Date().toISOString().split('T')[0];
+                    filteredTransactions = transactions.filter(t => t.date.startsWith(today));
+                } else if(filter === 'week') {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    filteredTransactions = transactions.filter(t => new Date(t.date) > weekAgo);
+                } else if(filter === 'month') {
+                    const monthAgo = new Date();
+                    monthAgo.setMonth(monthAgo.getMonth() - 1);
+                    filteredTransactions = transactions.filter(t => new Date(t.date) > monthAgo);
+                }
+                
+                tableBody.innerHTML = '';
+                
+                filteredTransactions.forEach(transaction => {
+                    const row = document.createElement('tr');
+                    
+                    let statusText = '';
+                    let statusClass = '';
+                    
+                    if(currentLang === 'ar') {
+                        if(transaction.status === 'success') statusText = 'مكتمل';
+                        else if(transaction.status === 'pending') statusText = 'قيد الانتظار';
+                        else statusText = 'فشل';
+                    } else if(currentLang === 'fr') {
+                        if(transaction.status === 'success') statusText = 'Terminé';
+                        else if(transaction.status === 'pending') statusText = 'En attente';
+                        else statusText = 'Échoué';
+                    } else {
+                        if(transaction.status === 'success') statusText = 'Completed';
+                        else if(transaction.status === 'pending') statusText = 'Pending';
+                        else statusText = 'Failed';
+                    }
+                    
+                    if(transaction.status === 'success') statusClass = 'status-success';
+                    else if(transaction.status === 'pending') statusClass = 'status-pending';
+                    else statusClass = 'status-failed';
+                    
+                    row.innerHTML = `
+                        <td>${transaction.date.split(' ')[0]}</td>
+                        <td>${transaction.place}</td>
+                        <td>${transaction.amount} دج</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                if(filteredTransactions.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="4" style="text-align: center; padding: 40px;">
+                            <i class="fas fa-exchange-alt" style="font-size: 2.5rem; color: var(--gray-light); margin-bottom: 15px;"></i>
+                            <p class="lang-ar">لا توجد عمليات لعرضها</p>
+                            <p class="lang-fr">Aucune transaction à afficher</p>
+                            <p class="lang-en">No transactions to display</p>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            }
+            
+            // === تحديث قائمة الخدمات ===
+            function updateServicesList(filter = 'all') {
+                const servicesList = document.getElementById('servicesList');
+                
+                let filteredServices = [...services];
+                
+                if(filter !== 'all') {
+                    filteredServices = services.filter(s => s.type === filter);
+                }
+                
+                servicesList.innerHTML = '';
+                
+                filteredServices.forEach(service => {
+                    const serviceItem = document.createElement('div');
+                    serviceItem.className = 'service-item';
+                    
+                    let icon = '';
+                    if(service.type === 'hotel') icon = 'fas fa-hotel';
+                    else if(service.type === 'restaurant') icon = 'fas fa-utensils';
+                    else if(service.type === 'museum') icon = 'fas fa-landmark';
+                    else icon = 'fas fa-hiking';
+                    
+                    let stars = '';
+                    const fullStars = Math.floor(service.rating);
+                    const hasHalfStar = service.rating % 1 >= 0.5;
+                    
+                    for(let i = 0; i < 5; i++) {
+                        if(i < fullStars) {
+                            stars += '<i class="fas fa-star"></i>';
+                        } else if(i === fullStars && hasHalfStar) {
+                            stars += '<i class="fas fa-star-half-alt"></i>';
+                        } else {
+                            stars += '<i class="far fa-star"></i>';
+                        }
+                    }
+                    
+                    serviceItem.innerHTML = `
+                        <div class="service-icon">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="service-info">
+                            <h4>${service.name}</h4>
+                            <div class="service-date">${service.date}</div>
+                            <div class="service-rating">${stars} (${service.rating})</div>
+                            <p style="margin-top: 8px; color: var(--gray); font-size: 0.85rem;">${service.description}</p>
+                        </div>
+                    `;
+                    
+                    servicesList.appendChild(serviceItem);
+                });
+                
+                if(filteredServices.length === 0) {
+                    servicesList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; grid-column: 1 / -1;">
+                            <i class="fas fa-concierge-bell" style="font-size: 2.5rem; color: var(--gray-light); margin-bottom: 15px;"></i>
+                            <p class="lang-ar">لا توجد خدمات لعرضها</p>
+                            <p class="lang-fr">Aucun service à afficher</p>
+                            <p class="lang-en">No services to display</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // === طرق الدفع ===
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // === شحن البطاقة ===
+            document.getElementById('rechargeBtn').addEventListener('click', function() {
+                const customAmount = document.getElementById('customAmount').value;
+                const selectedMethod = document.querySelector('.payment-method.selected').getAttribute('data-method');
+                const currentLang = document.body.getAttribute('data-lang');
+                
+                if(!customAmount || customAmount < 1000) {
+                    let message = '';
+                    if(currentLang === 'ar') {
+                        message = 'الرجاء إدخال مبلغ صحيح (1000 دج على الأقل)';
+                    } else if(currentLang === 'fr') {
+                        message = 'Veuillez entrer un montant valide (au moins 1000 DZD)';
+                    } else {
+                        message = 'Please enter a valid amount (at least 1000 DZD)';
+                    }
+                    alert(message);
+                    return;
+                }
+                
+                let confirmMessage = '';
+                let methodName = '';
+                
+                if(selectedMethod === 'visa') {
+                    methodName = currentLang === 'ar' ? 'فيزا' : currentLang === 'fr' ? 'Visa' : 'Visa';
+                } else if(selectedMethod === 'mastercard') {
+                    methodName = currentLang === 'ar' ? 'ماستركارد' : currentLang === 'fr' ? 'Mastercard' : 'Mastercard';
+                } else if(selectedMethod === 'paypal') {
+                    methodName = 'PayPal';
+                } else {
+                    methodName = currentLang === 'ar' ? 'Apple Pay' : currentLang === 'fr' ? 'Apple Pay' : 'Apple Pay';
+                }
+                
+                if(currentLang === 'ar') {
+                    confirmMessage = `هل تريد شحن ${customAmount} دج باستخدام ${methodName}؟`;
+                } else if(currentLang === 'fr') {
+                    confirmMessage = `Voulez-vous recharger ${customAmount} DZD en utilisant ${methodName} ?`;
+                } else {
+                    confirmMessage = `Do you want to recharge ${customAmount} DZD using ${methodName}?`;
+                }
+                
+                if(confirm(confirmMessage)) {
+                    const amount = parseInt(customAmount);
+                    currentBalance += amount;
+                    
+                    const newTransaction = {
+                        id: transactions.length + 1,
+                        date: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                        place: 'شحن الرصيد',
+                        service: 'شحن',
+                        amount: amount,
+                        status: 'success',
+                        code: 'TXN-' + Date.now().toString().substr(-6)
+                    };
+                    
+                    transactions.unshift(newTransaction);
+                    
+                    updateBalanceDisplay();
+                    updateTransactionsTable();
+                    
+                    let successMessage = '';
+                    if(currentLang === 'ar') {
+                        successMessage = `تم شحن ${amount} دج بنجاح! الرصيد الجديد: ${currentBalance} دج`;
+                    } else if(currentLang === 'fr') {
+                        successMessage = `${amount} DZD rechargés avec succès ! Nouveau solde: ${currentBalance} DZD`;
+                    } else {
+                        successMessage = `${amount} DZD recharged successfully! New balance: ${currentBalance} DZD`;
+                    }
+                    
+                    alert(successMessage);
+                    
+                    document.getElementById('customAmount').value = '';
+                }
+            });
+            
+            // === تحديث عرض الرصيد ===
+            function updateBalanceDisplay() {
+                document.querySelector('.balance-amount').textContent = currentBalance.toLocaleString();
+                document.querySelectorAll('.stat-value')[0].innerHTML = `${currentBalance.toLocaleString()} <span style="font-size: 1rem;">دج</span>`;
+            }
+            
+            // === فلتر العمليات ===
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.getAttribute('data-filter');
+                    updateTransactionsTable(filter);
+                });
+            });
+            
+            // === فلتر الخدمات ===
+            const serviceTabs = document.querySelectorAll('.services-tabs .tab-btn');
+            serviceTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    serviceTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const filter = this.getAttribute('data-service');
+                    updateServicesList(filter);
+                });
+            });
+            
+            // === فلتر الخريطة ===
+            const mapFilters = document.querySelectorAll('.map-filter');
+            mapFilters.forEach(filter => {
+                filter.addEventListener('click', function() {
+                    mapFilters.forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    const type = this.getAttribute('data-type');
+                    filterMapMarkers(type);
+                });
+            });
+            
+            // === فلتر الإعدادات ===
+            const settingTabs = document.querySelectorAll('.settings-tabs .tab-btn');
+            settingTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    settingTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const setting = this.getAttribute('data-setting');
+                    document.querySelectorAll('.settings-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    document.getElementById(setting + 'Settings').style.display = 'block';
+                });
+            });
+            
+            // === إبلاغ عن فقدان البطاقة ===
+            document.getElementById('reportCardBtn').addEventListener('click', function() {
+                const currentLang = document.body.getAttribute('data-lang');
+                let message = '';
+                
+                if(currentLang === 'ar') {
+                    message = 'هل تريد الإبلاغ عن فقدان بطاقتك؟ سيتم إلغاء تنشيط البطاقة الحالية وإصدار بطاقة جديدة.';
+                } else if(currentLang === 'fr') {
+                    message = 'Voulez-vous signaler la perte de votre carte ? La carte actuelle sera désactivée et une nouvelle carte sera émise.';
+                } else {
+                    message = 'Do you want to report your card lost? The current card will be deactivated and a new card will be issued.';
+                }
+                
+                if(confirm(message)) {
+                    let successMessage = '';
+                    if(currentLang === 'ar') {
+                        successMessage = 'تم الإبلاغ عن فقدان البطاقة. ستصل إليك البطاقة الجديدة خلال 5-7 أيام عمل.';
+                    } else if(currentLang === 'fr') {
+                        successMessage = 'Perte de carte signalée. Votre nouvelle carte arrivera dans les 5-7 jours ouvrables.';
+                    } else {
+                        successMessage = 'Card loss reported. Your new card will arrive in 5-7 business days.';
+                    }
+                    
+                    alert(successMessage);
+                }
+            });
+            
+            // === نسخ كود العرض ===
+            document.querySelectorAll('.offer-card .btn-primary').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const code = this.parentElement.querySelector('.offer-code').textContent;
+                    const currentLang = document.body.getAttribute('data-lang');
+                    
+                    navigator.clipboard.writeText(code).then(() => {
+                        let message = '';
+                        if(currentLang === 'ar') {
+                            message = `تم نسخ الكود: ${code}`;
+                        } else if(currentLang === 'fr') {
+                            message = `Code copié: ${code}`;
+                        } else {
+                            message = `Code copied: ${code}`;
+                        }
+                        
+                        const originalHTML = this.innerHTML;
+                        this.innerHTML = '<i class="fas fa-check"></i> ' + 
+                            (currentLang === 'ar' ? 'تم النسخ!' : 
+                             currentLang === 'fr' ? 'Copié!' : 'Copied!');
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalHTML;
+                        }, 2000);
+                        
+                        alert(message);
+                    });
+                });
+            });
+            
+            // === حفظ الإعدادات ===
+            document.getElementById('savePersonalBtn').addEventListener('click', function() {
+                const currentLang = document.body.getAttribute('data-lang');
+                let message = '';
+                
+                if(currentLang === 'ar') {
+                    message = 'تم حفظ المعلومات الشخصية بنجاح';
+                } else if(currentLang === 'fr') {
+                    message = 'Informations personnelles enregistrées avec succès';
+                } else {
+                    message = 'Personal information saved successfully';
+                }
+                
+                alert(message);
+            });
+            
+            document.getElementById('saveSecurityBtn').addEventListener('click', function() {
+                const currentLang = document.body.getAttribute('data-lang');
+                let message = '';
+                
+                if(currentLang === 'ar') {
+                    message = 'تم تحديث إعدادات الأمان بنجاح';
+                } else if(currentLang === 'fr') {
+                    message = 'Paramètres de sécurité mis à jour avec succès';
+                } else {
+                    message = 'Security settings updated successfully';
+                }
+                
+                alert(message);
+            });
+            
+            document.getElementById('savePreferencesBtn').addEventListener('click', function() {
+                const currentLang = document.body.getAttribute('data-lang');
+                let message = '';
+                
+                if(currentLang === 'ar') {
+                    message = 'تم حفظ التفضيلات بنجاح';
+                } else if(currentLang === 'fr') {
+                    message = 'Préférences enregistrées avec succès';
+                } else {
+                    message = 'Preferences saved successfully';
+                }
+                
+                alert(message);
+            });
+            
+            // === البحث في العمليات ===
+            const searchInput = document.querySelector('.search-box input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#transactionsTable tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+            
+            // === الخريطة التفاعلية ===
+            function initMap() {
+                if (!document.getElementById('mapContainer')) return;
+                
+                if (map) {
+                    map.remove();
+                    markers.forEach(marker => marker.remove());
+                    markers = [];
+                }
+                
+                // إنشاء الخريطة
+                map = L.map('mapContainer').setView([28.0339, 1.6596], 6);
+                
+                // إضافة طبقة الخريطة
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 18,
+                }).addTo(map);
+                
+                // نقاط الخدمات السياحية في الجزائر
+                const touristPoints = [
+                    {
+                        name: 'الجزائر العاصمة',
+                        type: 'hotel',
+                        lat: 36.7525,
+                        lng: 3.0410,
+                        description: 'فنادق ومناطق سياحية رئيسية'
+                    },
+                    {
+                        name: 'وهران',
+                        type: 'hotel',
+                        lat: 35.6971,
+                        lng: -0.6359,
+                        description: 'فنادق على ساحل البحر'
+                    },
+                    {
+                        name: 'قسنطينة',
+                        type: 'museum',
+                        lat: 36.3650,
+                        lng: 6.6147,
+                        description: 'المتاحف والجسور المعلقة'
+                    },
+                    {
+                        name: 'تلمسان',
+                        type: 'museum',
+                        lat: 34.8828,
+                        lng: -1.3167,
+                        description: 'المواقع التاريخية'
+                    },
+                    {
+                        name: 'عنابة',
+                        type: 'restaurant',
+                        lat: 36.9025,
+                        lng: 7.7556,
+                        description: 'مطاعم المأكولات البحرية'
+                    },
+                    {
+                        name: 'غرداية',
+                        type: 'activity',
+                        lat: 32.4890,
+                        lng: 3.6736,
+                        description: 'رحلات الصحراء'
+                    },
+                    {
+                        name: 'تيميمون',
+                        type: 'activity',
+                        lat: 29.2631,
+                        lng: 0.2310,
+                        description: 'واحات الصحراء'
+                    },
+                    {
+                        name: 'بجاية',
+                        type: 'restaurant',
+                        lat: 36.7509,
+                        lng: 5.0567,
+                        description: 'مطاعم تقليدية'
+                    }
+                ];
+                
+                // إضافة النقاط إلى الخريطة
+                touristPoints.forEach(point => {
+                    let iconColor;
+                    switch(point.type) {
+                        case 'hotel':
+                            iconColor = 'blue';
+                            break;
+                        case 'restaurant':
+                            iconColor = 'red';
+                            break;
+                        case 'museum':
+                            iconColor = 'purple';
+                            break;
+                        case 'activity':
+                            iconColor = 'green';
+                            break;
+                        default:
+                            iconColor = 'orange';
+                    }
+                    
+                    const icon = L.divIcon({
+                        html: `<div style="background-color: ${iconColor}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
+                        className: 'custom-marker',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+                    
+                    const marker = L.marker([point.lat, point.lng], { icon: icon })
+                        .addTo(map)
+                        .bindPopup(`
+                            <div style="text-align: right; font-family: sans-serif;">
+                                <h4 style="margin: 0 0 5px 0; color: #1a3c3c;">${point.name}</h4>
+                                <p style="margin: 0 0 5px 0; font-size: 0.9em; color: #666;">${point.description}</p>
+                                <small style="color: #888;">
+                                    ${point.type === 'hotel' ? '🏨 فندق' : 
+                                      point.type === 'restaurant' ? '🍴 مطعم' : 
+                                      point.type === 'museum' ? '🏛️ متحف' : '🚵 نشاط'}
+                                </small>
+                            </div>
+                        `);
+                    
+                    markers.push(marker);
+                });
+                
+                // إضافة عنصر تحكم للتحجيم
+                L.control.scale().addTo(map);
+            }
+            
+            // فلتر علامات الخريطة
+            function filterMapMarkers(type) {
+                markers.forEach(marker => {
+                    const markerType = getMarkerType(marker);
+                    if (type === 'all' || markerType === type) {
+                        marker.getElement().style.display = 'block';
+                    } else {
+                        marker.getElement().style.display = 'none';
+                    }
+                });
+            }
+            
+            function getMarkerType(marker) {
+                const lat = marker.getLatLng().lat;
+                
+                if (lat > 35) return 'hotel';
+                if (lat > 34) return 'museum';
+                if (lat > 33) return 'restaurant';
+                return 'activity';
+            }
+            
+            // === التهيئة الأولية ===
+            function init() {
+                updateCopyrightYear();
+                initMockData();
+                updateBalanceDisplay();
+                updateTransactionsTable();
+                updateServicesList();
+                loadCardImages();
+                
+                // عرض قسم لوحة التحكم افتراضياً
+                showSection('dashboard');
+            }
+            
+            // بدء التطبيق
+            init();
+        });
+    </script>
+</body>
+</html>
