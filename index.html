@@ -16,10 +16,10 @@
         }
         
         :root {
-            --primary: #1a9c9c;    /* فيروزي مخضر */
-            --secondary: #d4af37;  /* ذهبي */
-            --dark: #1a3c3c;       /* أخضر داكن */
-            --light: #f8f9fa;      /* أبيض فاتح */
+            --primary: #1a9c9c;
+            --secondary: #d4af37;
+            --dark: #1a3c3c;
+            --light: #f8f9fa;
             --gray: #6c757d;
             --gray-light: #e9ecef;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -49,7 +49,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
         
-        /* ===== الشريط الذهبي المتموج كما تريد ===== */
         .gold-wave-container {
             position: absolute;
             bottom: 0;
@@ -69,36 +68,6 @@
             height: 35px;
         }
         
-        .gold-wave::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background-color: rgba(0, 0, 0, 0.1);
-        }
-        
-        .gold-wave::after {
-            content: '';
-            position: absolute;
-            bottom: 1px;
-            left: 0;
-            width: 100%;
-            height: 20px;
-            fill: none;
-            stroke: var(--secondary);
-            stroke-width: 20;
-            background: none;
-            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 150' preserveAspectRatio='none'%3E%3Cpath d='M0,80 C150,150 350,0 500,80'/%3E%3C/svg%3E");
-            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 150' preserveAspectRatio='none'%3E%3Cpath d='M0,80 C150,150 350,0 500,80'/%3E%3C/svg%3E");
-            -webkit-mask-size: 100% 100%;
-            mask-size: 100% 100%;
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-        }
-        
-        /* بديل SVG للمتصفحات التي لا تدعم mask-image */
         .gold-wave svg {
             position: absolute;
             bottom: 1px;
@@ -884,6 +853,10 @@
             padding: 20px;
         }
         
+        .login-overlay.show {
+            display: flex;
+        }
+        
         .login-container {
             background: white;
             border-radius: 20px;
@@ -1262,7 +1235,7 @@
                 <span class="lang-fr">Tableau de bord (Touriste)</span>
                 <span class="lang-en">Dashboard (Tourist)</span>
             </a>
-            <a href="index0.html" class="dropdown-item" id="dashboardLink">
+            <a href="index0.html" class="dropdown-item">
                 <i class="fas fa-tachometer-alt"></i>
                 <span class="lang-ar">لوحة التحكم (الإدارة)</span>
                 <span class="lang-fr">Tableau de bord (Admin)</span>
@@ -1274,7 +1247,12 @@
                 <span class="lang-fr">Tableau partenaire touristique</span>
                 <span class="lang-en">Tourist Partner Dashboard</span>
             </a>
-
+            <a href="#" class="dropdown-item" id="logoutBtn" style="display:none;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="lang-ar">تسجيل الخروج</span>
+                <span class="lang-fr">Déconnexion</span>
+                <span class="lang-en">Logout</span>
+            </a>
         </div>
     </header>
 
@@ -1849,14 +1827,14 @@
                         <label for="modalEmail" class="lang-ar">البريد الإلكتروني أو رقم الهاتف</label>
                         <label for="modalEmail" class="lang-fr">E-mail ou numéro de téléphone</label>
                         <label for="modalEmail" class="lang-en">Email or Phone Number</label>
-                        <input type="text" id="modalEmail" class="form-control" required>
+                        <input type="text" id="modalEmail" class="form-control" required placeholder="أي قيمة مقبولة">
                     </div>
                     
                     <div class="form-group">
                         <label for="modalPassword" class="lang-ar">كلمة المرور</label>
                         <label for="modalPassword" class="lang-fr">Mot de passe</label>
                         <label for="modalPassword" class="lang-en">Password</label>
-                        <input type="password" id="modalPassword" class="form-control" required>
+                        <input type="password" id="modalPassword" class="form-control" required placeholder="أي قيمة مقبولة">
                     </div>
                     
                     <div style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -1898,7 +1876,6 @@
 
     <!-- JavaScript مدمج -->
     <script>
-        // ===== JavaScript: الصفحة الرئيسية =====
         document.addEventListener('DOMContentLoaded', function() {
             // === تحديث السنة في الفوتر ===
             function updateCopyrightYear() {
@@ -1926,13 +1903,11 @@
             const languageOptions = document.getElementById('languageOptions');
             const languageOptionsList = document.querySelectorAll('.language-option');
             
-            // فتح/إغلاق قائمة اللغات
             currentFlag.addEventListener('click', function(e) {
                 e.stopPropagation();
                 languageOptions.classList.toggle('show');
             });
             
-            // إغلاق قائمة اللغات عند النقر خارجها
             document.addEventListener('click', function() {
                 languageOptions.classList.remove('show');
             });
@@ -1941,29 +1916,19 @@
                 e.stopPropagation();
             });
             
-            // تغيير اللغة
             languageOptionsList.forEach(option => {
                 option.addEventListener('click', function() {
                     const lang = this.getAttribute('data-lang');
-                    
-                    // تحديث اللغة في body
                     document.body.setAttribute('data-lang', lang);
                     
-                    // تحديث العلم الحالي
                     const flagClass = this.className.split(' ')[1];
                     currentFlag.className = 'current-flag ' + flagClass;
                     currentFlag.setAttribute('title', this.getAttribute('title'));
                     
-                    // حفظ التفضيل
                     localStorage.setItem('preferredLang', lang);
                     
-                    // إغلاق القائمة
                     languageOptions.classList.remove('show');
-                    
-                    // تحديث حالة تسجيل الدخول
                     updateLoginState();
-                    
-                    // تحديث السنة في الفوتر
                     updateCopyrightYear();
                 });
             });
@@ -1972,7 +1937,6 @@
             const savedLang = localStorage.getItem('preferredLang') || 'ar';
             document.body.setAttribute('data-lang', savedLang);
             
-            // تحديث العلم الحالي حسب اللغة المحفوظة
             if(savedLang === 'ar') {
                 currentFlag.className = 'current-flag flag-ar';
                 currentFlag.title = 'العربية';
@@ -1984,19 +1948,20 @@
                 currentFlag.title = 'English';
             }
             
-            // تحديث السنة في الفوتر
             updateCopyrightYear();
             
             // === القائمة المنسدلة ===
             const menuBtn = document.getElementById('menuBtn');
             const dropdownMenu = document.getElementById('dropdownMenu');
             const userIcon = document.getElementById('userIcon');
+            const logoutBtn = document.getElementById('logoutBtn');
             
             menuBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 dropdownMenu.classList.toggle('show');
             });
             
+            // عند النقر على أيقونة الحساب: تظهر واجهة تسجيل الدخول مباشرة
             userIcon.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
@@ -2004,13 +1969,11 @@
                 if(isLoggedIn) {
                     dropdownMenu.classList.toggle('show');
                 } else {
-                    // إذا لم يكن مسجل دخول، عرض واجهة تسجيل الدخول
-                    loginOverlay.style.display = 'flex';
+                    loginOverlay.classList.add('show');
                     document.body.style.overflow = 'hidden';
                 }
             });
             
-            // إغلاق القائمة عند النقر خارجها
             document.addEventListener('click', function(e) {
                 if(!dropdownMenu.contains(e.target) && !menuBtn.contains(e.target) && !userIcon.contains(e.target)) {
                     dropdownMenu.classList.remove('show');
@@ -2018,7 +1981,8 @@
             });
             
             // === زر تسجيل الخروج ===
-            document.getElementById('logoutBtn').addEventListener('click', function() {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 const currentLang = document.body.getAttribute('data-lang');
                 let message = '';
                 
@@ -2053,11 +2017,9 @@
                 const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
                 
                 if(isLoggedIn) {
-                    // إذا كان مسجلاً، الانتقال إلى لوحة التحكم
                     window.location.href = 'index1.html';
                 } else {
-                    // إذا لم يكن مسجلاً، عرض واجهة تسجيل الدخول
-                    loginOverlay.style.display = 'flex';
+                    loginOverlay.classList.add('show');
                     document.body.style.overflow = 'hidden';
                 }
             });
@@ -2067,75 +2029,60 @@
             const closeLoginBtn = document.getElementById('closeLoginBtn');
             const registerLink = document.getElementById('registerLink');
             
-            // إغلاق واجهة تسجيل الدخول
             closeLoginBtn.addEventListener('click', function() {
-                loginOverlay.style.display = 'none';
+                loginOverlay.classList.remove('show');
                 document.body.style.overflow = 'auto';
             });
             
-            // إغلاق عند النقر خارجها
             loginOverlay.addEventListener('click', function(e) {
                 if(e.target === loginOverlay) {
-                    loginOverlay.style.display = 'none';
+                    loginOverlay.classList.remove('show');
                     document.body.style.overflow = 'auto';
                 }
             });
             
-            // الانتقال إلى التسجيل
             registerLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                const currentLang = document.body.getAttribute('data-lang');
+                loginOverlay.classList.remove('show');
                 
+                const currentLang = document.body.getAttribute('data-lang');
                 if(currentLang === 'ar') {
-                    alert('سيتم فتح نموذج إنشاء حساب جديد');
+                    alert('يمكنك استخدام أي بيانات لتسجيل الدخول');
                 } else if(currentLang === 'fr') {
-                    alert('Un formulaire de création de compte s\'ouvrira');
+                    alert('Vous pouvez utiliser n\'importe quelle donnée pour vous connecter');
                 } else {
-                    alert('A new account creation form will open');
+                    alert('You can use any data to login');
                 }
             });
             
-            // تسجيل الدخول الفعلي
+            // === تسجيل الدخول - أي قيمة مقبولة ===
             document.getElementById('loginFormModal').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const email = document.getElementById('modalEmail').value;
                 const password = document.getElementById('modalPassword').value;
-                const currentLang = document.body.getAttribute('data-lang');
                 
+                // أي قيمة غير فارغة مقبولة
                 if(email && password) {
-                    // محاكاة تسجيل الدخول الناجح
                     localStorage.setItem('userLoggedIn', 'true');
-                    localStorage.setItem('userEmail', email);
+                    localStorage.setItem('userEmail', email || 'user@example.com');
                     
-                    // إغلاق النافذة
-                    loginOverlay.style.display = 'none';
+                    loginOverlay.classList.remove('show');
                     document.body.style.overflow = 'auto';
                     
-                    // تحديث الواجهة
                     updateLoginState();
                     
-                    // رسالة نجاح
-                    let message = '';
-                    if(currentLang === 'ar') {
-                        message = 'تم تسجيل الدخول بنجاح! مرحباً ' + email;
-                    } else if(currentLang === 'fr') {
-                        message = 'Connexion réussie ! Bienvenue ' + email;
-                    } else {
-                        message = 'Login successful! Welcome ' + email;
-                    }
-                    alert(message);
-                    
-                    // الانتقال إلى لوحة التحكم
+                    // توجيه مباشر إلى index1.html بعد تسجيل الدخول
                     window.location.href = 'index1.html';
                 } else {
+                    const currentLang = document.body.getAttribute('data-lang');
                     let message = '';
                     if(currentLang === 'ar') {
-                        message = 'يرجى ملء جميع الحقول';
+                        message = 'يرجى إدخال أي قيمة في الحقول';
                     } else if(currentLang === 'fr') {
-                        message = 'Veuillez remplir tous les champs';
+                        message = 'Veuillez entrer n\'importe quelle valeur dans les champs';
                     } else {
-                        message = 'Please fill in all fields';
+                        message = 'Please enter any value in the fields';
                     }
                     alert(message);
                 }
@@ -2144,32 +2091,16 @@
             // === تحديث حالة تسجيل الدخول ===
             function updateLoginState() {
                 const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
-                const userEmail = localStorage.getItem('userEmail');
-                const currentLang = document.body.getAttribute('data-lang');
                 const userIconElement = document.getElementById('userIcon');
-                const dashboardLink = document.getElementById('dashboardLink');
+                const logoutBtn = document.getElementById('logoutBtn');
                 
                 if(isLoggedIn) {
-                    // تغيير الأيقونة
                     userIconElement.innerHTML = '<i class="fas fa-user-check"></i>';
+                    logoutBtn.style.display = 'block';
                     
-                    // تحديث رابط لوحة التحكم ليشمل البريد
-                    if(userEmail) {
-                        dashboardLink.href = 'index1.html?user=' + encodeURIComponent(userEmail);
-                    }
-                    
-                    // تغيير عنوان الزر في القائمة
-                    const logoutText = document.querySelector('#logoutBtn span');
-                    if(currentLang === 'ar') {
-                        logoutText.textContent = 'تسجيل الخروج';
-                    } else if(currentLang === 'fr') {
-                        logoutText.textContent = 'Déconnexion';
-                    } else {
-                        logoutText.textContent = 'Logout';
-                    }
-                    
-                    // تحديث زر شراء البطاقة
                     const buyCardText = document.querySelector('#buyCardBtn span');
+                    const currentLang = document.body.getAttribute('data-lang');
+                    
                     if(currentLang === 'ar') {
                         buyCardText.textContent = 'اذهب إلى لوحة التحكم';
                     } else if(currentLang === 'fr') {
@@ -2178,17 +2109,12 @@
                         buyCardText.textContent = 'Go to Dashboard';
                     }
                     
-                    // تحديث أيقونة زر الشراء
                     const buyCardIcon = document.querySelector('#buyCardBtn i');
                     buyCardIcon.className = 'fas fa-tachometer-alt';
                 } else {
-                    // إعادة الأيقونة الأصلية
                     userIconElement.innerHTML = '<i class="fas fa-user"></i>';
+                    logoutBtn.style.display = 'none';
                     
-                    // رابط لوحة التحكم العادي
-                    dashboardLink.href = 'index1.html';
-                    
-                    // إعادة زر شراء البطاقة إلى حالته الأصلية
                     const buyCardText = document.querySelector('#buyCardBtn span');
                     const currentLang = document.body.getAttribute('data-lang');
                     
@@ -2200,13 +2126,12 @@
                         buyCardText.textContent = 'Buy Card Now';
                     }
                     
-                    // إعادة أيقونة زر الشراء
                     const buyCardIcon = document.querySelector('#buyCardBtn i');
                     buyCardIcon.className = 'fas fa-shopping-cart';
                 }
             }
             
-            // التهيئة الأولية - لا يوجد مستخدم مسجل افتراضياً
+            // التهيئة الأولية - التأكد من أن المستخدم غير مسجل عند تحميل الصفحة
             localStorage.removeItem('userLoggedIn');
             localStorage.removeItem('userEmail');
             updateLoginState();
@@ -2231,39 +2156,23 @@
             });
             
             // === تأثيرات التمرير ===
-            const observerOptions = {
-                threshold: 0.05,
-                rootMargin: '0px 0px -50px 0px'
-            };
-            
             const observer = new IntersectionObserver(function(entries) {
                 entries.forEach(entry => {
                     if(entry.isIntersecting) {
-                        entry.target.classList.add('animated');
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
                     }
                 });
-            }, observerOptions);
+            }, { threshold: 0.1 });
             
-            // تطبيق التأثير على العناصر
             document.querySelectorAll('.step, .service-card, .vm-card, .founder-card').forEach(el => {
                 el.style.opacity = '0';
                 el.style.transform = 'translateY(20px)';
                 el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                
-                const elementObserver = new IntersectionObserver(function(entries) {
-                    entries.forEach(entry => {
-                        if(entry.isIntersecting) {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }
-                    });
-                }, { threshold: 0.1 });
-                
-                elementObserver.observe(el);
+                observer.observe(el);
             });
             
             // === تأثيرات إضافية ===
-            // تأثير على الأزرار عند الضغط
             document.querySelectorAll('button').forEach(btn => {
                 btn.addEventListener('mousedown', function() {
                     this.style.transform = 'scale(0.95)';

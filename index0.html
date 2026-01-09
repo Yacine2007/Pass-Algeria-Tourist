@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algeria Pass - لوحة التحكم الإدارية</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== CSS: لوحة التحكم الإدارية ===== */
+        :root {
+            --primary: #1a9c9c;
+            --secondary: #d4af37;
+            --dark: #1a3c3c;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        
+        /* ===== شاشة الدخول ===== */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .login-logo {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .login-title {
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .login-subtitle {
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .password-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(26, 156, 156, 0.2);
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 156, 156, 0.3);
+        }
+        
+        .login-error {
+            color: #ff4444;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        /* ===== الهيدر الثابت ===== */
+        .main-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* الشعار */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        
+        .logo-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .logo-pass {
+            color: var(--secondary);
+            font-weight: 900;
+        }
+        
+        /* عناصر التحكم في الهيدر */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* زر تبديل اللغة بالعلم */
+        .language-switcher {
+            position: relative;
+        }
+        
+        .language-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 50px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        
+        .language-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .flag-icon {
+            width: 40px;
+            height: 30px;
+            border-radius: 4px;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid white;
+        }
+        
+        .flag-ar {
+            background-image: url('https://flagcdn.com/w320/dz.png');
+        }
+        
+        .flag-fr {
+            background-image: url('https://flagcdn.com/w320/fr.png');
+        }
+        
+        .flag-en {
+            background-image: url('https://flagcdn.com/w320/gb.png');
+        }
+        
+        .language-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-hover);
+            min-width: 60px;
+            display: none;
+            z-index: 1002;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .language-option {
+            width: 50px;
+            height: 35px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid transparent;
+        }
+        
+        .language-option:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        /* زر القائمة */
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        /* القائمة الجانبية */
+        .sidebar {
+            width: 250px;
+            background: white;
+            position: fixed;
+            right: 0;
+            top: 70px;
+            bottom: 0;
+            overflow-y: auto;
+            box-shadow: -2px 0 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            transform: translateX(100%);
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .sidebar-header h3 {
+            font-size: 1.2rem;
+        }
+        
+        .sidebar-menu {
+            padding: 15px 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-right: 4px solid transparent;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover {
+            background: var(--light);
+            border-right-color: var(--primary);
+            padding-right: 25px;
+        }
+        
+        .menu-item.active {
+            background: var(--primary);
+            color: white;
+            border-right-color: var(--secondary);
+        }
+        
+        .menu-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        /* المحتوى الرئيسي */
+        .main-content {
+            padding-top: 70px;
+            transition: all 0.3s ease;
+        }
+        
+        /* الهيدر الداخلي */
+        .page-header {
+            background: white;
+            padding: 25px 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 {
+            color: var(--dark);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .page-header h1 i {
+            color: var(--primary);
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .breadcrumb a:hover {
+            color: var(--secondary);
+        }
+        
+        /* المحتوى */
+        .content {
+            padding: 0 30px 30px;
+        }
+        
+        /* الأقسام */
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* بطاقات الإحصائيات */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .stat-icon {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        
+        .stat-content h3 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .stat-content p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        /* الرسم البياني */
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-header h3 {
+            color: var(--dark);
+            font-size: 1.4rem;
+        }
+        
+        /* الجداول */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 18px 15px;
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status.active {
+            background: rgba(76, 175, 80, 0.15);
+            color: #2e7d32;
+        }
+        
+        .status.pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #f57c00;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn.edit {
+            color: var(--primary);
+            background: rgba(26, 156, 156, 0.1);
+        }
+        
+        .action-btn.edit:hover {
+            background: rgba(26, 156, 156, 0.2);
+        }
+        
+        .action-btn.delete {
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        
+        .action-btn.delete:hover {
+            background: rgba(244, 67, 54, 0.2);
+        }
+        
+        /* التقارير */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .report-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .report-card h4 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .report-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .btn-download {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-download:hover {
+            background: var(--dark);
+        }
+        
+        /* الإعدادات */
+        .settings-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .setting-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .setting-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .setting-item h4 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-options {
+            list-style: none;
+        }
+        
+        .setting-options li {
+            padding: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .setting-options li:last-child {
+            border-bottom: none;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            right: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(-26px);
+        }
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        /* ===== تصميم متجاوب للهواتف ===== */
+        @media (max-width: 768px) {
+            .main-header {
+                height: 60px;
+                padding: 0 15px;
+            }
+            
+            .logo-text {
+                font-size: 1.3rem;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .main-content {
+                padding-top: 60px;
+            }
+            
+            .page-header {
+                padding: 20px;
+            }
+            
+            .content {
+                padding: 0 20px 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            
+            .stat-content h3 {
+                font-size: 1.7rem;
+            }
+            
+            .chart-container,
+            .table-container,
+            .reports-grid,
+            .settings-card {
+                padding: 20px;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-header {
+                height: 55px;
+                padding: 0 10px;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+            
+            .header-controls {
+                gap: 10px;
+            }
+            
+            .language-btn {
+                width: 45px;
+                height: 33px;
+            }
+            
+            .flag-icon {
+                width: 35px;
+                height: 25px;
+            }
+            
+            .language-option {
+                width: 45px;
+                height: 33px;
+            }
+            
+            .menu-btn {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* تحسينات للأجهزة اللوحية */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .reports-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body data-lang="ar">
+    <!-- شاشة الدخول -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-logo">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h2 class="login-title" data-lang-key="loginTitle">لوحة التحكم الإدارية</h2>
+            <p class="login-subtitle" data-lang-key="loginSubtitle">أدخل كلمة المرور للدخول</p>
+            
+            <input type="password" class="password-input" id="passwordInput" placeholder="1234" maxlength="4">
+            <button class="login-btn" id="loginBtn" data-lang-key="loginBtn">دخول</button>
+            
+            <div class="login-error" id="loginError" data-lang-key="loginError">كلمة المرور غير صحيحة</div>
+        </div>
+    </div>
+
+    <!-- الهيدر الثابت -->
+    <header class="main-header" id="mainHeader" style="display: none;">
+        <!-- الشعار -->
+        <div class="logo-container">
+            <div class="logo-text">
+                <span class="logo-pass">Pass</span>
+                <span data-lang-key="logoText">Algeria Tourist</span>
+            </div>
+        </div>
+        
+        <!-- عناصر التحكم -->
+        <div class="header-controls">
+            <!-- تبديل اللغة بالعلم -->
+            <div class="language-switcher">
+                <button class="language-btn" id="languageBtn" title="تغيير اللغة">
+                    <div class="flag-icon flag-ar" id="currentFlag"></div>
+                </button>
+                <div class="language-options" id="languageOptions">
+                    <div class="language-option flag-ar" data-lang="ar" title="العربية"></div>
+                    <div class="language-option flag-fr" data-lang="fr" title="Français"></div>
+                    <div class="language-option flag-en" data-lang="en" title="English"></div>
+                </div>
+            </div>
+            
+            <!-- زر القائمة -->
+            <button class="menu-btn" id="menuBtn" title="القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- القائمة الجانبية -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3 data-lang-key="adminPanel"><i class="fas fa-user-shield"></i> لوحة التحكم الإدارية</h3>
+        </div>
+        
+        <div class="sidebar-menu">
+            <a href="#dashboard" class="menu-item active" onclick="showSection('dashboard')">
+                <i class="fas fa-tachometer-alt"></i>
+                <span data-lang-key="dashboard">لوحة التحكم</span>
+            </a>
+            <a href="#tourists" class="menu-item" onclick="showSection('tourists')">
+                <i class="fas fa-users"></i>
+                <span data-lang-key="tourists">إدارة السائحين</span>
+            </a>
+            <a href="#partners" class="menu-item" onclick="showSection('partners')">
+                <i class="fas fa-handshake"></i>
+                <span data-lang-key="partners">الشركاء السياحيون</span>
+            </a>
+            <a href="#cards" class="menu-item" onclick="showSection('cards')">
+                <i class="fas fa-credit-card"></i>
+                <span data-lang-key="cards">إدارة البطاقات</span>
+            </a>
+            <a href="#transactions" class="menu-item" onclick="showSection('transactions')">
+                <i class="fas fa-exchange-alt"></i>
+                <span data-lang-key="transactions">العمليات المالية</span>
+            </a>
+            <a href="#reports" class="menu-item" onclick="showSection('reports')">
+                <i class="fas fa-chart-bar"></i>
+                <span data-lang-key="reports">التقارير والإحصائيات</span>
+            </a>
+            <a href="#settings" class="menu-item" onclick="showSection('settings')">
+                <i class="fas fa-cog"></i>
+                <span data-lang-key="settings">إعدادات النظام</span>
+            </a>
+            <a href="index.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span data-lang-key="home">الصفحة الرئيسية</span>
+            </a>
+            <a href="index1.html" class="menu-item">
+                <i class="fas fa-user"></i>
+                <span data-lang-key="touristPanel">لوحة السائح</span>
+            </a>
+            <a href="index2.html" class="menu-item">
+                <i class="fas fa-store"></i>
+                <span data-lang-key="partnerPanel">لوحة الشريك</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main-content" id="mainContent" style="display: none;">
+        <!-- الهيدر الداخلي -->
+        <div class="page-header">
+            <h1><i class="fas fa-tachometer-alt"></i> <span id="pageTitle" data-lang-key="dashboard">لوحة التحكم الإدارية</span></h1>
+            <div class="breadcrumb">
+                <a href="index.html" data-lang-key="home">الرئيسية</a>
+                <i class="fas fa-chevron-left"></i>
+                <span data-lang-key="adminPanel">لوحة التحكم الإدارية</span>
+            </div>
+        </div>
+
+        <!-- المحتوى -->
+        <div class="content">
+            <!-- قسم لوحة التحكم -->
+            <section id="dashboard" class="section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>5,200</h3>
+                            <p data-lang-key="activeTourists">سائح نشط</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>120</h3>
+                            <p data-lang-key="touristPartners">شريك سياحي</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, var(--secondary) 0%, #8e6d2d 100%);">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>125,350 دج</h3>
+                            <p data-lang-key="totalRevenue">إجمالي الإيرادات</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>8,450</h3>
+                            <p data-lang-key="activeCards">بطاقة نشطة</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 data-lang-key="weeklyStats">إحصائيات الاستخدام الأسبوعية</h3>
+                    </div>
+                    <canvas id="chart" height="120"></canvas>
+                </div>
+            </section>
+
+            <!-- قسم إدارة السائحين -->
+            <section id="tourists" class="section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-lang-key="name">الاسم</th>
+                                <th data-lang-key="nationality">الجنسية</th>
+                                <th data-lang-key="phone">رقم الهاتف</th>
+                                <th data-lang-key="balance">الرصيد</th>
+                                <th data-lang-key="status">الحالة</th>
+                                <th data-lang-key="actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-lang-key="ahmed">أحمد بن علي</td>
+                                <td>فرنسا</td>
+                                <td>+33 6 12 34 56 78</td>
+                                <td>2,500 دج</td>
+                                <td><span class="status active" data-lang-key="active">نشط</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-lang-key="john">جون سميث</td>
+                                <td>بريطانيا</td>
+                                <td>+44 7 1234 5678</td>
+                                <td>1,800 دج</td>
+                                <td><span class="status active" data-lang-key="active">نشط</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-lang-key="maria">ماريا غارسيا</td>
+                                <td>إسبانيا</td>
+                                <td>+34 6 123 45 67</td>
+                                <td>3,200 دج</td>
+                                <td><span class="status pending" data-lang-key="pending">معلق</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- قسم الشركاء السياحيون -->
+            <section id="partners" class="section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-lang-key="establishment">اسم المنشأة</th>
+                                <th data-lang-key="type">النوع</th>
+                                <th data-lang-key="city">المدينة</th>
+                                <th data-lang-key="transactions">عدد العمليات</th>
+                                <th data-lang-key="status">الحالة</th>
+                                <th data-lang-key="actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-lang-key="hotelSahara">فندق الصحراء</td>
+                                <td data-lang-key="hotel">فندق</td>
+                                <td data-lang-key="algiers">الجزائر العاصمة</td>
+                                <td>340</td>
+                                <td><span class="status active" data-lang-key="active">نشط</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-lang-key="restaurantBahia">مطعم البهية</td>
+                                <td data-lang-key="restaurant">مطعم</td>
+                                <td data-lang-key="oran">وهران</td>
+                                <td>215</td>
+                                <td><span class="status active" data-lang-key="active">نشط</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-lang-key="nationalMuseum">المتحف الوطني</td>
+                                <td data-lang-key="museum">متحف</td>
+                                <td data-lang-key="constantine">قسنطينة</td>
+                                <td>178</td>
+                                <td><span class="status active" data-lang-key="active">نشط</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- قسم إدارة البطاقات -->
+            <section id="cards" class="section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-lang-key="cardNumber">رقم البطاقة</th>
+                                <th data-lang-key="owner">المالك</th>
+                                <th data-lang-key="issueDate">تاريخ الإصدار</th>
+                                <th data-lang-key="expiryDate">تاريخ الانتهاء</th>
+                                <th data-lang-key="balance">الرصيد</th>
+                                <th data-lang-key="status">الحالة</th>
+                                <th data-lang-key="actions">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>AP-001-2024-0001</td>
+                                <td data-lang-key="ahmed">أحمد بن علي</td>
+                                <td>2024-01-15</td>
+                                <td>2025-01-15</td>
+                                <td>2,500 دج</td>
+                                <td><span class="status active" data-lang-key="active">نشطة</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>AP-001-2024-0002</td>
+                                <td data-lang-key="john">جون سميث</td>
+                                <td>2024-02-10</td>
+                                <td>2025-02-10</td>
+                                <td>1,800 دج</td>
+                                <td><span class="status active" data-lang-key="active">نشطة</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>AP-001-2024-0003</td>
+                                <td data-lang-key="maria">ماريا غارسيا</td>
+                                <td>2024-03-05</td>
+                                <td>2025-03-05</td>
+                                <td>3,200 دج</td>
+                                <td><span class="status pending" data-lang-key="pending">معلقة</span></td>
+                                <td class="action-buttons">
+                                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- قسم العمليات المالية -->
+            <section id="transactions" class="section">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-lang-key="transactionNumber">رقم العملية</th>
+                                <th data-lang-key="type">النوع</th>
+                                <th data-lang-key="user">المستخدم</th>
+                                <th data-lang-key="amount">المبلغ</th>
+                                <th data-lang-key="date">التاريخ</th>
+                                <th data-lang-key="status">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TX-2024-001</td>
+                                <td data-lang-key="recharge">شحن</td>
+                                <td data-lang-key="ahmed">أحمد بن علي</td>
+                                <td style="color: #2e7d32;">+1,000 دج</td>
+                                <td>2024-01-08 14:30</td>
+                                <td><span class="status active" data-lang-key="completed">مكتمل</span></td>
+                            </tr>
+                            <tr>
+                                <td>TX-2024-002</td>
+                                <td data-lang-key="payment">دفع</td>
+                                <td data-lang-key="john">جون سميث</td>
+                                <td style="color: #c62828;">-500 دج</td>
+                                <td>2024-01-08 11:15</td>
+                                <td><span class="status active" data-lang-key="completed">مكتمل</span></td>
+                            </tr>
+                            <tr>
+                                <td>TX-2024-003</td>
+                                <td data-lang-key="refund">استرداد</td>
+                                <td data-lang-key="maria">ماريا غارسيا</td>
+                                <td style="color: #c62828;">-200 دج</td>
+                                <td>2024-01-07 16:45</td>
+                                <td><span class="status pending" data-lang-key="processing">قيد المعالجة</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- قسم التقارير -->
+            <section id="reports" class="section">
+                <div class="reports-grid">
+                    <div class="report-card">
+                        <h4><i class="fas fa-chart-line"></i> <span data-lang-key="monthlyReport">تقرير الأداء الشهري</span></h4>
+                        <p data-lang-key="monthlyReportDesc">تحليل شامل لأداء النظام خلال الشهر الحالي مع مقارنة بالأشهر السابقة.</p>
+                        <button class="btn-download">
+                            <i class="fas fa-download"></i>
+                            <span data-lang-key="download">تحميل التقرير</span>
+                        </button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <h4><i class="fas fa-users"></i> <span data-lang-key="touristsReport">تقرير السائحين</span></h4>
+                        <p data-lang-key="touristsReportDesc">إحصاءات تفصيلية عن السائحين حسب الجنسية، العمر، ومعدل الإنفاق.</p>
+                        <button class="btn-download">
+                            <i class="fas fa-download"></i>
+                            <span data-lang-key="download">تحميل التقرير</span>
+                        </button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <h4><i class="fas fa-handshake"></i> <span data-lang-key="partnersReport">تقرير الشركاء</span></h4>
+                        <p data-lang-key="partnersReportDesc">تحليل أداء الشركاء السياحيين وحجم العمليات لكل منهم.</p>
+                        <button class="btn-download">
+                            <i class="fas fa-download"></i>
+                            <span data-lang-key="download">تحميل التقرير</span>
+                        </button>
+                    </div>
+                    
+                    <div class="report-card">
+                        <h4><i class="fas fa-money-bill-wave"></i> <span data-lang-key="financialReport">تقرير مالي</span></h4>
+                        <p data-lang-key="financialReportDesc">بيانات مالية مفصلة عن الإيرادات، المصاريف، والأرباح.</p>
+                        <button class="btn-download">
+                            <i class="fas fa-download"></i>
+                            <span data-lang-key="download">تحميل التقرير</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم الإعدادات -->
+            <section id="settings" class="section">
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <h4><i class="fas fa-user-shield"></i> <span data-lang-key="permissionsSettings">إعدادات الصلاحيات</span></h4>
+                        <ul class="setting-options">
+                            <li>
+                                <span data-lang-key="fullAdminAccess">الوصول الكامل للإدارة</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                            <li>
+                                <span data-lang-key="addNewUsers">إضافة مستخدمين جدد</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                            <li>
+                                <span data-lang-key="editTouristData">تعديل بيانات السائحين</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <h4><i class="fas fa-shield-alt"></i> <span data-lang-key="securitySettings">إعدادات الأمان</span></h4>
+                        <ul class="setting-options">
+                            <li>
+                                <span data-lang-key="twoFactorAuth">المصادقة الثنائية</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                            <li>
+                                <span data-lang-key="secureLogin">تسجيل دخول آمن</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                            <li>
+                                <span data-lang-key="securityAlerts">تنبيهات الأمان</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <h4><i class="fas fa-credit-card"></i> <span data-lang-key="paymentSettings">إعدادات الدفع</span></h4>
+                        <ul class="setting-options">
+                            <li>
+                                <span data-lang-key="onlinePayment">الدفع عبر الإنترنت</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                            <li>
+                                <span data-lang-key="cashOnDelivery">الدفع عند الاستلام</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                            <li>
+                                <span data-lang-key="walletPayment">دفع عبر المحفظة</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // ===== JavaScript: لوحة التحكم الإدارية =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // === بيانات اللغات ===
+            const translations = {
+                ar: {
+                    // شاشة الدخول
+                    loginTitle: "لوحة التحكم الإدارية",
+                    loginSubtitle: "أدخل كلمة المرور للدخول",
+                    loginBtn: "دخول",
+                    loginError: "كلمة المرور غير صحيحة",
+                    
+                    // واجهة المستخدم
+                    logoText: "Algeria Tourist",
+                    adminPanel: "لوحة التحكم الإدارية",
+                    dashboard: "لوحة التحكم",
+                    tourists: "إدارة السائحين",
+                    partners: "الشركاء السياحيون",
+                    cards: "إدارة البطاقات",
+                    transactions: "العمليات المالية",
+                    reports: "التقارير والإحصائيات",
+                    settings: "إعدادات النظام",
+                    home: "الصفحة الرئيسية",
+                    touristPanel: "لوحة السائح",
+                    partnerPanel: "لوحة الشريك",
+                    
+                    // إحصائيات
+                    activeTourists: "سائح نشط",
+                    touristPartners: "شريك سياحي",
+                    totalRevenue: "إجمالي الإيرادات",
+                    activeCards: "بطاقة نشطة",
+                    weeklyStats: "إحصائيات الاستخدام الأسبوعية",
+                    
+                    // جداول
+                    name: "الاسم",
+                    nationality: "الجنسية",
+                    phone: "رقم الهاتف",
+                    balance: "الرصيد",
+                    status: "الحالة",
+                    actions: "الإجراءات",
+                    active: "نشط",
+                    pending: "معلق",
+                    completed: "مكتمل",
+                    processing: "قيد المعالجة",
+                    ahmed: "أحمد بن علي",
+                    john: "جون سميث",
+                    maria: "ماريا غارسيا",
+                    
+                    // شركاء
+                    establishment: "اسم المنشأة",
+                    type: "النوع",
+                    city: "المدينة",
+                    transactions: "عدد العمليات",
+                    hotelSahara: "فندق الصحراء",
+                    restaurantBahia: "مطعم البهية",
+                    nationalMuseum: "المتحف الوطني",
+                    hotel: "فندق",
+                    restaurant: "مطعم",
+                    museum: "متحف",
+                    algiers: "الجزائر العاصمة",
+                    oran: "وهران",
+                    constantine: "قسنطينة",
+                    
+                    // بطاقات
+                    cardNumber: "رقم البطاقة",
+                    owner: "المالك",
+                    issueDate: "تاريخ الإصدار",
+                    expiryDate: "تاريخ الانتهاء",
+                    
+                    // عمليات مالية
+                    transactionNumber: "رقم العملية",
+                    user: "المستخدم",
+                    amount: "المبلغ",
+                    date: "التاريخ",
+                    recharge: "شحن",
+                    payment: "دفع",
+                    refund: "استرداد",
+                    
+                    // تقارير
+                    monthlyReport: "تقرير الأداء الشهري",
+                    monthlyReportDesc: "تحليل شامل لأداء النظام خلال الشهر الحالي مع مقارنة بالأشهر السابقة.",
+                    touristsReport: "تقرير السائحين",
+                    touristsReportDesc: "إحصاءات تفصيلية عن السائحين حسب الجنسية، العمر، ومعدل الإنفاق.",
+                    partnersReport: "تقرير الشركاء",
+                    partnersReportDesc: "تحليل أداء الشركاء السياحيين وحجم العمليات لكل منهم.",
+                    financialReport: "تقرير مالي",
+                    financialReportDesc: "بيانات مالية مفصلة عن الإيرادات، المصاريف، والأرباح.",
+                    download: "تحميل التقرير",
+                    
+                    // إعدادات
+                    permissionsSettings: "إعدادات الصلاحيات",
+                    securitySettings: "إعدادات الأمان",
+                    paymentSettings: "إعدادات الدفع",
+                    fullAdminAccess: "الوصول الكامل للإدارة",
+                    addNewUsers: "إضافة مستخدمين جدد",
+                    editTouristData: "تعديل بيانات السائحين",
+                    twoFactorAuth: "المصادقة الثنائية",
+                    secureLogin: "تسجيل دخول آمن",
+                    securityAlerts: "تنبيهات الأمان",
+                    onlinePayment: "الدفع عبر الإنترنت",
+                    cashOnDelivery: "الدفع عند الاستلام",
+                    walletPayment: "دفع عبر المحفظة"
+                },
+                fr: {
+                    loginTitle: "Panneau d'Administration",
+                    loginSubtitle: "Entrez le mot de passe pour accéder",
+                    loginBtn: "Connexion",
+                    loginError: "Mot de passe incorrect",
+                    
+                    logoText: "Algeria Tourist",
+                    adminPanel: "Panneau d'Administration",
+                    dashboard: "Tableau de bord",
+                    tourists: "Gestion des touristes",
+                    partners: "Partenaires touristiques",
+                    cards: "Gestion des cartes",
+                    transactions: "Transactions financières",
+                    reports: "Rapports et statistiques",
+                    settings: "Paramètres système",
+                    home: "Page d'accueil",
+                    touristPanel: "Panneau touriste",
+                    partnerPanel: "Panneau partenaire",
+                    
+                    activeTourists: "Touristes actifs",
+                    touristPartners: "Partenaires touristiques",
+                    totalRevenue: "Revenu total",
+                    activeCards: "Cartes actives",
+                    weeklyStats: "Statistiques d'utilisation hebdomadaires",
+                    
+                    name: "Nom",
+                    nationality: "Nationalité",
+                    phone: "Téléphone",
+                    balance: "Solde",
+                    status: "Statut",
+                    actions: "Actions",
+                    active: "Actif",
+                    pending: "En attente",
+                    completed: "Terminé",
+                    processing: "En traitement",
+                    ahmed: "Ahmed Benali",
+                    john: "John Smith",
+                    maria: "Maria Garcia",
+                    
+                    establishment: "Établissement",
+                    type: "Type",
+                    city: "Ville",
+                    transactions: "Transactions",
+                    hotelSahara: "Hôtel Sahara",
+                    restaurantBahia: "Restaurant El Bahia",
+                    nationalMuseum: "Musée National",
+                    hotel: "Hôtel",
+                    restaurant: "Restaurant",
+                    museum: "Musée",
+                    algiers: "Alger",
+                    oran: "Oran",
+                    constantine: "Constantine",
+                    
+                    cardNumber: "Numéro de carte",
+                    owner: "Propriétaire",
+                    issueDate: "Date d'émission",
+                    expiryDate: "Date d'expiration",
+                    
+                    transactionNumber: "Numéro de transaction",
+                    user: "Utilisateur",
+                    amount: "Montant",
+                    date: "Date",
+                    recharge: "Recharge",
+                    payment: "Paiement",
+                    refund: "Remboursement",
+                    
+                    monthlyReport: "Rapport mensuel de performance",
+                    monthlyReportDesc: "Analyse complète des performances du système au cours du mois en cours avec comparaison aux mois précédents.",
+                    touristsReport: "Rapport des touristes",
+                    touristsReportDesc: "Statistiques détaillées sur les touristes par nationalité, âge et taux de dépenses.",
+                    partnersReport: "Rapport des partenaires",
+                    partnersReportDesc: "Analyse des performances des partenaires touristiques et du volume des transactions pour chacun.",
+                    financialReport: "Rapport financier",
+                    financialReportDesc: "Données financières détaillées sur les revenus, les dépenses et les bénéfices.",
+                    download: "Télécharger le rapport",
+                    
+                    permissionsSettings: "Paramètres de permissions",
+                    securitySettings: "Paramètres de sécurité",
+                    paymentSettings: "Paramètres de paiement",
+                    fullAdminAccess: "Accès complet administration",
+                    addNewUsers: "Ajouter de nouveaux utilisateurs",
+                    editTouristData: "Modifier les données des touristes",
+                    twoFactorAuth: "Authentification à deux facteurs",
+                    secureLogin: "Connexion sécurisée",
+                    securityAlerts: "Alertes de sécurité",
+                    onlinePayment: "Paiement en ligne",
+                    cashOnDelivery: "Paiement à la livraison",
+                    walletPayment: "Paiement par portefeuille"
+                },
+                en: {
+                    loginTitle: "Admin Control Panel",
+                    loginSubtitle: "Enter password to access",
+                    loginBtn: "Login",
+                    loginError: "Incorrect password",
+                    
+                    logoText: "Algeria Tourist",
+                    adminPanel: "Admin Control Panel",
+                    dashboard: "Dashboard",
+                    tourists: "Tourists Management",
+                    partners: "Tourist Partners",
+                    cards: "Cards Management",
+                    transactions: "Financial Transactions",
+                    reports: "Reports & Statistics",
+                    settings: "System Settings",
+                    home: "Home Page",
+                    touristPanel: "Tourist Dashboard",
+                    partnerPanel: "Partner Dashboard",
+                    
+                    activeTourists: "Active Tourists",
+                    touristPartners: "Tourist Partners",
+                    totalRevenue: "Total Revenue",
+                    activeCards: "Active Cards",
+                    weeklyStats: "Weekly Usage Statistics",
+                    
+                    name: "Name",
+                    nationality: "Nationality",
+                    phone: "Phone",
+                    balance: "Balance",
+                    status: "Status",
+                    actions: "Actions",
+                    active: "Active",
+                    pending: "Pending",
+                    completed: "Completed",
+                    processing: "Processing",
+                    ahmed: "Ahmed Benali",
+                    john: "John Smith",
+                    maria: "Maria Garcia",
+                    
+                    establishment: "Establishment",
+                    type: "Type",
+                    city: "City",
+                    transactions: "Transactions",
+                    hotelSahara: "Hotel Sahara",
+                    restaurantBahia: "Restaurant El Bahia",
+                    nationalMuseum: "National Museum",
+                    hotel: "Hotel",
+                    restaurant: "Restaurant",
+                    museum: "Museum",
+                    algiers: "Algiers",
+                    oran: "Oran",
+                    constantine: "Constantine",
+                    
+                    cardNumber: "Card Number",
+                    owner: "Owner",
+                    issueDate: "Issue Date",
+                    expiryDate: "Expiry Date",
+                    
+                    transactionNumber: "Transaction Number",
+                    user: "User",
+                    amount: "Amount",
+                    date: "Date",
+                    recharge: "Recharge",
+                    payment: "Payment",
+                    refund: "Refund",
+                    
+                    monthlyReport: "Monthly Performance Report",
+                    monthlyReportDesc: "Comprehensive analysis of system performance during the current month with comparison to previous months.",
+                    touristsReport: "Tourists Report",
+                    touristsReportDesc: "Detailed statistics on tourists by nationality, age, and spending rate.",
+                    partnersReport: "Partners Report",
+                    partnersReportDesc: "Analysis of tourist partners' performance and transaction volume for each.",
+                    financialReport: "Financial Report",
+                    financialReportDesc: "Detailed financial data on revenues, expenses, and profits.",
+                    download: "Download Report",
+                    
+                    permissionsSettings: "Permissions Settings",
+                    securitySettings: "Security Settings",
+                    paymentSettings: "Payment Settings",
+                    fullAdminAccess: "Full Admin Access",
+                    addNewUsers: "Add New Users",
+                    editTouristData: "Edit Tourist Data",
+                    twoFactorAuth: "Two-Factor Authentication",
+                    secureLogin: "Secure Login",
+                    securityAlerts: "Security Alerts",
+                    onlinePayment: "Online Payment",
+                    cashOnDelivery: "Cash on Delivery",
+                    walletPayment: "Wallet Payment"
+                }
+            };
+            
+            // === نظام الدخول ===
+            const loginScreen = document.getElementById('loginScreen');
+            const passwordInput = document.getElementById('passwordInput');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginError = document.getElementById('loginError');
+            const mainHeader = document.getElementById('mainHeader');
+            const mainContent = document.getElementById('mainContent');
+            
+            // التحقق من حالة الدخول
+            const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+            
+            if (isLoggedIn) {
+                loginScreen.style.display = 'none';
+                mainHeader.style.display = 'flex';
+                mainContent.style.display = 'block';
+                document.body.style.overflow = 'auto';
+            }
+            
+            // حدث الدخول
+            loginBtn.addEventListener('click', function() {
+                const password = passwordInput.value;
+                
+                if (password === '1234') {
+                    // تسجيل الدخول الناجح
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    
+                    // إخفاء شاشة الدخول وإظهار الواجهة
+                    loginScreen.style.display = 'none';
+                    mainHeader.style.display = 'flex';
+                    mainContent.style.display = 'block';
+                    document.body.style.overflow = 'auto';
+                    
+                    // إظهار إشعار نجاح
+                    showNotification(getTranslation('loginSuccess', 'Connexion réussie', 'Login successful'), 'success');
+                } else {
+                    // خطأ في كلمة المرور
+                    loginError.style.display = 'block';
+                    passwordInput.style.borderColor = '#ff4444';
+                    passwordInput.value = '';
+                    
+                    setTimeout(() => {
+                        loginError.style.display = 'none';
+                        passwordInput.style.borderColor = '#e0e0e0';
+                    }, 3000);
+                }
+            });
+            
+            // الدخول عند الضغط على Enter
+            passwordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    loginBtn.click();
+                }
+            });
+            
+            // === إدارة اللغة ===
+            const languageBtn = document.getElementById('languageBtn');
+            const currentFlag = document.getElementById('currentFlag');
+            const languageOptions = document.getElementById('languageOptions');
+            const languageOptionItems = document.querySelectorAll('.language-option');
+            
+            // تحديد اللغة الحالية
+            let currentLang = localStorage.getItem('adminLang') || 'ar';
+            document.body.setAttribute('data-lang', currentLang);
+            
+            // تحديث العلم بناءً على اللغة الحالية
+            updateFlag(currentLang);
+            
+            // ترجمة النص
+            function translatePage(lang) {
+                currentLang = lang;
+                document.body.setAttribute('data-lang', lang);
+                
+                // تحديث جميع العناصر التي تحتوي على data-lang-key
+                document.querySelectorAll('[data-lang-key]').forEach(element => {
+                    const key = element.getAttribute('data-lang-key');
+                    if (translations[lang] && translations[lang][key]) {
+                        element.textContent = translations[lang][key];
+                    }
+                });
+                
+                // تحديث العنوان
+                document.title = `Algeria Pass - ${translations[lang].adminPanel}`;
+                
+                // تحديث العلم
+                updateFlag(lang);
+                
+                // حفظ اللغة المفضلة
+                localStorage.setItem('adminLang', lang);
+            }
+            
+            // تحديث العلم
+            function updateFlag(lang) {
+                currentFlag.className = 'flag-icon';
+                if (lang === 'ar') currentFlag.classList.add('flag-ar');
+                else if (lang === 'fr') currentFlag.classList.add('flag-fr');
+                else if (lang === 'en') currentFlag.classList.add('flag-en');
+            }
+            
+            // الحصول على ترجمة للنص الحالي
+            function getTranslation(ar, fr, en) {
+                if (currentLang === 'ar') return ar;
+                else if (currentLang === 'fr') return fr;
+                else return en;
+            }
+            
+            // فتح/إغلاق قائمة اللغات
+            languageBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageOptions.style.display = languageOptions.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // إغلاق القائمة عند النقر خارجها
+            document.addEventListener('click', function(e) {
+                if (!languageBtn.contains(e.target) && !languageOptions.contains(e.target)) {
+                    languageOptions.style.display = 'none';
+                }
+            });
+            
+            // تغيير اللغة
+            languageOptionItems.forEach(option => {
+                option.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    translatePage(lang);
+                    languageOptions.style.display = 'none';
+                    
+                    // إظهار إشعار
+                    showNotification(getTranslation('تم تغيير اللغة', 'Langue changée', 'Language changed'), 'success');
+                });
+            });
+            
+            // تحميل الترجمة عند بدء التشغيل
+            translatePage(currentLang);
+            
+            // === إدارة القائمة الجانبية ===
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.getElementById('menuBtn');
+            
+            // تبديل القائمة الجانبية
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+            }
+            
+            // أحداث الأزرار
+            menuBtn.addEventListener('click', toggleSidebar);
+            
+            // إغلاق القائمة عند النقر خارجها
+            document.addEventListener('click', function(e) {
+                if (!sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            });
+            
+            // === إظهار/إخفاء الأقسام ===
+            window.showSection = function(sectionId) {
+                // إخفاء جميع الأقسام
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // إظهار القسم المحدد
+                document.getElementById(sectionId).classList.add('active');
+                
+                // تحديث القائمة الجانبية
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.currentTarget.classList.add('active');
+                
+                // تحديث عنوان الصفحة
+                updatePageTitle(sectionId);
+                
+                // إغلاق القائمة على الجوال
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+            };
+            
+            // تحديث عنوان الصفحة
+            function updatePageTitle(sectionId) {
+                const pageTitle = document.getElementById('pageTitle');
+                const titles = {
+                    'dashboard': getTranslation('لوحة التحكم الإدارية', 'Panneau d\'Administration', 'Admin Control Panel'),
+                    'tourists': getTranslation('إدارة السائحين', 'Gestion des touristes', 'Tourists Management'),
+                    'partners': getTranslation('الشركاء السياحيون', 'Partenaires touristiques', 'Tourist Partners'),
+                    'cards': getTranslation('إدارة البطاقات', 'Gestion des cartes', 'Cards Management'),
+                    'transactions': getTranslation('العمليات المالية', 'Transactions financières', 'Financial Transactions'),
+                    'reports': getTranslation('التقارير والإحصائيات', 'Rapports et statistiques', 'Reports & Statistics'),
+                    'settings': getTranslation('إعدادات النظام', 'Paramètres système', 'System Settings')
+                };
+                
+                pageTitle.textContent = titles[sectionId];
+            }
+            
+            // === الرسم البياني ===
+            const chartCanvas = document.getElementById('chart');
+            const chart = new Chart(chartCanvas, {
+                type: 'line',
+                data: {
+                    labels: getTranslation(
+                        ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+                        ['Samedi', 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'],
+                        ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+                    ),
+                    datasets: [{
+                        label: getTranslation('عدد المستخدمين', "Nombre d'utilisateurs", 'Number of Users'),
+                        data: [120, 195, 150, 240, 180, 255, 210],
+                        borderColor: '#d4af37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // === أزرار الإجراءات ===
+            document.querySelectorAll('.action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (confirm(getTranslation('هل أنت متأكد من حذف هذا العنصر؟', 'Êtes-vous sûr de vouloir supprimer cet élément ?', 'Are you sure you want to delete this item?'))) {
+                        const row = this.closest('tr');
+                        row.style.opacity = '0';
+                        row.style.transform = 'translateX(50px)';
+                        
+                        setTimeout(() => {
+                            row.remove();
+                            showNotification(getTranslation('تم حذف العنصر بنجاح', 'Élément supprimé avec succès', 'Item deleted successfully'), 'success');
+                        }, 300);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showNotification(getTranslation('فتح نموذج التعديل', 'Ouvrir le formulaire de modification', 'Opening edit form'));
+                });
+            });
+            
+            // === أزرار تحميل التقارير ===
+            document.querySelectorAll('.btn-download').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showNotification(getTranslation('جاري تحميل التقرير...', 'Téléchargement du rapport...', 'Downloading report...'), 'warning');
+                    
+                    setTimeout(() => {
+                        showNotification(getTranslation('تم تحميل التقرير بنجاح', 'Rapport téléchargé avec succès', 'Report downloaded successfully'), 'success');
+                    }, 1500);
+                });
+            });
+            
+            // === مفاتيح التبديل ===
+            document.querySelectorAll('.switch input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const label = this.closest('li').querySelector('span').textContent;
+                    const status = this.checked ? 
+                        getTranslation('تم تفعيل', 'Activé', 'Enabled') : 
+                        getTranslation('تم تعطيل', 'Désactivé', 'Disabled');
+                    showNotification(`${status} ${label}`);
+                });
+            });
+            
+            // === إظهار الإشعارات ===
+            function showNotification(message, type = 'info') {
+                // إنشاء عنصر الإشعار
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    left: 20px;
+                    background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : type === 'warning' ? '#ff9800' : 'var(--primary)'};
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    z-index: 9999;
+                    animation: slideIn 0.3s ease-out;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    max-width: 400px;
+                `;
+                
+                const icon = type === 'success' ? 'fa-check-circle' : 
+                            type === 'error' ? 'fa-exclamation-circle' : 
+                            type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+                
+                notification.innerHTML = `
+                    <i class="fas ${icon}"></i>
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // إزالة الإشعار بعد 3 ثواني
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+            
+            // أنماط CSS للرسوم المتحركة
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(-100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(-100%); opacity: 0; }
+                }
+                
+                .login-success {
+                    background: #4CAF50;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // رسالة نجاح الدخول
+            function showLoginSuccess() {
+                return getTranslation('تم الدخول بنجاح', 'Connexion réussie', 'Login successful');
+            }
+        });
+    </script>
+</body>
+</html>
