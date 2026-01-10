@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Pass Algeria Tourist | بطاقة الجزائر السياحية</title>
+    <title>Algeria Tourist Pass | بطاقة الجزائر السياحية</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -89,7 +89,7 @@
             stroke-width: 20;
         }
         
-        /* ===== الشعار على اليمين ===== */
+        /* ===== الشعار مع الأيقونة ===== */
         .logo-container {
             display: flex;
             align-items: center;
@@ -99,28 +99,50 @@
             z-index: 2;
         }
         
+        .logo-with-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-direction: row; /* من اليمين لليسار (RTL) */
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background-image: url('favicon.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            order: 2; /* الصورة تأتي أولاً من اليمين */
+        }
+        
         .logo-text {
             color: white;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: baseline;
             gap: 5px;
-            background-color: rgba(26, 60, 60, 0.3);
-            padding: 5px 15px;
-            border-radius: 8px;
+            padding: 0;
+            order: 1; /* النص يأتي بعد الصورة */
+            direction: ltr; /* النص الإنجليزي من اليسار لليمين */
+            text-align: left;
+        }
+        
+        .logo-algeria {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .logo-tourist {
+            font-size: 1.4rem;
+            font-weight: 700;
         }
         
         .logo-pass {
             color: var(--secondary);
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 900;
-        }
-        
-        .logo-main {
-            font-size: 1.8rem;
-            font-weight: 700;
         }
         
         /* ===== عناصر التحكم على اليسار ===== */
@@ -586,10 +608,8 @@
         
         /* ===== قسم المبادرة ===== */
         .initiative {
-            padding: 80px 20px;
-            background: linear-gradient(135deg, var(--light) 0%, #e9ecef 100%);
-            border-top: 2px solid var(--secondary);
-            border-bottom: 2px solid var(--secondary);
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(26, 156, 156, 0.1) 0%, rgba(26, 60, 60, 0.05) 100%);
         }
         
         .initiative-content {
@@ -598,55 +618,58 @@
         }
         
         .founder-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: var(--shadow);
-            margin-top: 40px;
-            border: 2px solid var(--primary);
+            background: rgba(26, 156, 156, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .founder-header {
             display: flex;
             align-items: center;
-            gap: 25px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
+            justify-content: center;
         }
         
         .founder-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: bold;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-image: url('favicon.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: white;
             flex-shrink: 0;
-            border: 5px solid var(--secondary);
+            border: 2px solid var(--primary);
         }
         
         .founder-details h3 {
             color: var(--dark);
-            margin-bottom: 10px;
-            font-size: 1.6rem;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
         }
         
         .founder-details p {
             color: var(--gray);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 0.9rem;
         }
         
         .founder-details a {
             color: var(--primary);
             text-decoration: none;
             transition: color 0.3s;
+            font-size: 0.9rem;
         }
         
         .founder-details a:hover {
@@ -656,7 +679,8 @@
         
         .founder-details i {
             color: var(--primary);
-            width: 20px;
+            width: 16px;
+            font-size: 0.9rem;
         }
         
         /* ===== قسم اتصل بنا ===== */
@@ -759,10 +783,11 @@
         
         /* ===== الفوتر ===== */
         footer {
-            background-color: var(--dark);
+            background: linear-gradient(135deg, var(--dark) 0%, #0a2a2a 100%);
             color: white;
             padding: 60px 20px 30px;
             margin-top: 50px;
+            border-top: 3px solid var(--secondary);
         }
         
         .footer-content {
@@ -775,16 +800,90 @@
             margin-right: auto;
         }
         
-        .footer-logo h3 {
-            color: white;
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 20px;
-            font-size: 1.8rem;
+            flex-direction: row;
+        }
+        
+        .footer-logo-icon {
+            width: 40px;
+            height: 40px;
+            background-image: url('favicon.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            order: 2; /* الصورة تأتي أولاً من اليمين */
+        }
+        
+        .footer-logo-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            order: 1; /* النص يأتي بعد الصورة */
+            direction: ltr; /* النص الإنجليزي من اليسار لليمين */
+            text-align: left;
+        }
+        
+        .footer-logo-text .logo-algeria {
+            font-weight: 700;
+        }
+        
+        .footer-logo-text .logo-tourist {
+            font-weight: 700;
+        }
+        
+        .footer-logo-text .logo-pass {
+            color: var(--secondary);
+            font-weight: 900;
+        }
+        
+        .footer-description {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .footer-social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .footer-social-icon:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
         }
         
         .footer-links h4, .footer-contact h4 {
             color: var(--secondary);
             margin-bottom: 20px;
             font-size: 1.2rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
         }
         
         .footer-links ul {
@@ -792,7 +891,7 @@
         }
         
         .footer-links li {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         
         .footer-links a {
@@ -800,6 +899,7 @@
             text-decoration: none;
             transition: all 0.3s;
             display: inline-block;
+            font-size: 0.95rem;
         }
         
         .footer-links a:hover {
@@ -809,6 +909,17 @@
         
         .footer-contact p {
             margin-bottom: 15px;
+            color: #ddd;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .footer-contact i {
+            color: var(--secondary);
+            width: 20px;
+            margin-top: 3px;
         }
         
         .newsletter-form {
@@ -823,8 +934,14 @@
             min-width: 200px;
             padding: 12px 15px;
             border-radius: 8px;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .newsletter-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
         
         .copyright {
@@ -986,11 +1103,11 @@
             }
             
             .logo-text {
-                font-size: 1.6rem;
+                font-size: 1.2rem;
             }
             
-            .logo-pass, .logo-main {
-                font-size: 1.6rem;
+            .logo-algeria, .logo-tourist, .logo-pass {
+                font-size: 1.2rem;
             }
             
             .hero {
@@ -1009,11 +1126,11 @@
             }
             
             .logo-text {
-                font-size: 1.4rem;
+                font-size: 1.1rem;
             }
             
-            .logo-pass, .logo-main {
-                font-size: 1.4rem;
+            .logo-algeria, .logo-tourist, .logo-pass {
+                font-size: 1.1rem;
             }
             
             .hero h2 {
@@ -1098,6 +1215,7 @@
             
             .footer-content {
                 grid-template-columns: 1fr;
+                gap: 30px;
             }
             
             .newsletter-form {
@@ -1128,11 +1246,11 @@
             }
             
             .logo-text {
-                font-size: 1.2rem;
+                font-size: 1rem;
             }
             
-            .logo-pass, .logo-main {
-                font-size: 1.2rem;
+            .logo-algeria, .logo-tourist, .logo-pass {
+                font-size: 1rem;
             }
             
             .header-controls {
@@ -1157,6 +1275,15 @@
             
             .hero h2 {
                 font-size: 1.5rem;
+            }
+            
+            .logo-with-icon {
+                gap: 8px;
+            }
+            
+            .logo-icon {
+                width: 35px;
+                height: 35px;
             }
         }
         
@@ -1213,11 +1340,17 @@
             </button>
         </div>
         
-        <!-- الشعار على اليمين -->
+        <!-- الشعار مع الأيقونة على اليمين (الصورة قبل الاسم) -->
         <div class="logo-container">
-            <div class="logo-text">
-                <span class="logo-pass">Pass</span>
-                <span class="logo-main">Algeria Tourist</span>
+            <div class="logo-with-icon">
+                <!-- الأيقونة أولاً -->
+                <div class="logo-icon"></div>
+                <!-- الاسم بعد الأيقونة: Algeria Tourist Pass -->
+                <div class="logo-text">
+                    <span class="logo-algeria">Algeria</span>
+                    <span class="logo-tourist">Tourist</span>
+                    <span class="logo-pass">Pass</span>
+                </div>
             </div>
         </div>
         
@@ -1514,19 +1647,6 @@
                         increases the duration of their stay and the quality of their experience. We also work to support small and medium-sized tourism businesses 
                         by giving them access to a wide range of tourists.
                     </p>
-                    
-                    <p class="lang-ar">
-                        نهدف إلى رفع عدد السياح الوافدين إلى الجزائر بنسبة 30% خلال السنوات الخمس القادمة، 
-                        وزيادة معدل إنفاق السائح اليومي من خلال توفير خيارات دفع متنوعة وسهلة.
-                    </p>
-                    <p class="lang-fr">
-                        Nous visons à augmenter le nombre de touristes visitant l'Algérie de 30 % au cours des cinq prochaines années, 
-                        et à augmenter les dépenses quotidiennes des touristes en offrant des options de paiement diverses et faciles.
-                    </p>
-                    <p class="lang-en">
-                        We aim to increase the number of tourists visiting Algeria by 30% over the next five years, 
-                        and increase daily tourist spending by offering diverse and easy payment options.
-                    </p>
                 </div>
             </div>
         </section>
@@ -1540,22 +1660,14 @@
             </div>
             
             <div class="initiative-content">
-                <p class="lang-ar" style="text-align: center; max-width: 800px; margin: 0 auto 30px; font-size: 1.1rem;">
+                <p class="lang-ar" style="text-align: center; max-width: 800px; margin: 0 auto 20px; font-size: 1rem; color: var(--gray);">
                     فكرة مشروع Algeria Tourist Pass هي مبادرة طلابية تهدف إلى تطوير القطاع السياحي في الجزائر 
                     من خلال توحيد وسائل الدفع والخدمات السياحية تحت منصة واحدة ذكية.
-                </p>
-                <p class="lang-fr" style="text-align: center; max-width: 800px; margin: 0 auto 30px; font-size: 1.1rem;">
-                    L'idée du projet Algeria Tourist Pass est une initiative étudiante visant à développer le secteur touristique en Algérie 
-                    en unifiant les moyens de paiement et les services touristiques sous une seule plateforme intelligente.
-                </p>
-                <p class="lang-en" style="text-align: center; max-width: 800px; margin: 0 auto 30px; font-size: 1.1rem;">
-                    The Algeria Tourist Pass project idea is a student initiative aimed at developing the tourism sector in Algeria 
-                    by unifying payment methods and tourist services under one smart platform.
                 </p>
                 
                 <div class="founder-card">
                     <div class="founder-header">
-                        <div class="founder-avatar">ف</div>
+                        <div class="founder-avatar"></div>
                         <div class="founder-details">
                             <h3 class="lang-ar">مولياط فريال وسام</h3>
                             <h3 class="lang-fr">Moulayat Ferial Oussama</h3>
@@ -1582,21 +1694,6 @@
                             </p>
                         </div>
                     </div>
-                    
-                    <p class="lang-ar" style="margin-top: 25px; font-size: 1.05rem;">
-                        تم تطوير هذا المشروع كجزء من متطلبات الحصول على شهادة الماجستير في قانون الأعمال، حيث يجمع بين الابتكار التكنولوجي 
-                        والمتطلبات القانونية للقطاع السياحي، بهدف تقديم حل عملي يساهم في تطوير السياحة الجزائرية.
-                    </p>
-                    <p class="lang-fr" style="margin-top: 25px; font-size: 1.05rem;">
-                        Ce projet a été développé dans le cadre des exigences pour l'obtention du diplôme de master en droit des affaires, 
-                        combinant innovation technologique et exigences juridiques du secteur touristique, dans le but de fournir une solution 
-                        pratique contribuant au développement du tourisme algérien.
-                    </p>
-                    <p class="lang-en" style="margin-top: 25px; font-size: 1.05rem;">
-                        This project was developed as part of the requirements for obtaining a Master's degree in Business Law, 
-                        combining technological innovation and legal requirements of the tourism sector, with the aim of providing a practical 
-                        solution contributing to the development of Algerian tourism.
-                    </p>
                 </div>
             </div>
         </section>
@@ -1721,11 +1818,40 @@
     <!-- الفوتر -->
     <footer>
         <div class="footer-content">
-            <div class="footer-logo">
-                <h3>Pass Algeria Tourist</h3>
-                <p class="lang-ar">بطاقة سياحية موحدة تجعل رحلتك في الجزائر أسهل وأمتع.</p>
-                <p class="lang-fr">Une carte touristique unifiée qui rend votre voyage en Algérie plus facile.</p>
-                <p class="lang-en">A unified tourist card that makes your trip to Algeria easier.</p>
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon"></div>
+                    <div class="footer-logo-text">
+                        <span class="logo-algeria">Algeria</span>
+                        <span class="logo-tourist">Tourist</span>
+                        <span class="logo-pass">Pass</span>
+                    </div>
+                </div>
+                
+                <p class="footer-description lang-ar">
+                    بطاقة سياحية موحدة تجعل رحلتك في الجزائر أسهل وأمتع. نقدم لك حلاً شاملاً للوصول إلى جميع الخدمات السياحية ببطاقة واحدة.
+                </p>
+                <p class="footer-description lang-fr">
+                    Une carte touristique unifiée qui rend votre voyage en Algérie plus facile et plus agréable. Nous vous offrons une solution complète pour accéder à tous les services touristiques avec une seule carte.
+                </p>
+                <p class="footer-description lang-en">
+                    A unified tourist card that makes your trip to Algeria easier and more enjoyable. We offer you a comprehensive solution to access all tourist services with a single card.
+                </p>
+                
+                <div class="footer-social">
+                    <a href="#" class="footer-social-icon">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="footer-social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="footer-social-icon">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="footer-social-icon">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
             </div>
             
             <div class="footer-links">
@@ -1748,6 +1874,11 @@
                         <span class="lang-fr">Services</span>
                         <span class="lang-en">Services</span>
                     </a></li>
+                    <li><a href="#about">
+                        <span class="lang-ar">من نحن</span>
+                        <span class="lang-fr">À propos</span>
+                        <span class="lang-en">About</span>
+                    </a></li>
                     <li><a href="#contact">
                         <span class="lang-ar">اتصل بنا</span>
                         <span class="lang-fr">Contact</span>
@@ -1763,30 +1894,45 @@
                 <ul>
                     <li><a href="#">
                         <span class="lang-ar">شروط الاستخدام</span>
-                        <span class="lang-fr">Conditions</span>
-                        <span class="lang-en">Terms</span>
+                        <span class="lang-fr">Conditions d'utilisation</span>
+                        <span class="lang-en">Terms of Use</span>
                     </a></li>
                     <li><a href="#">
-                        <span class="lang-ar">خصوصية</span>
-                        <span class="lang-fr">Confidentialité</span>
-                        <span class="lang-en">Privacy</span>
+                        <span class="lang-ar">سياسة الخصوصية</span>
+                        <span class="lang-fr">Politique de confidentialité</span>
+                        <span class="lang-en">Privacy Policy</span>
                     </a></li>
                     <li><a href="#">
-                        <span class="lang-ar">أسئلة</span>
+                        <span class="lang-ar">الأسئلة الشائعة</span>
                         <span class="lang-fr">FAQ</span>
                         <span class="lang-en">FAQ</span>
+                    </a></li>
+                    <li><a href="#">
+                        <span class="lang-ar">مراكز البيع</span>
+                        <span class="lang-fr">Points de vente</span>
+                        <span class="lang-en">Sales Points</span>
                     </a></li>
                 </ul>
             </div>
             
             <div class="footer-contact">
-                <h4 class="lang-ar">اشترك</h4>
-                <h4 class="lang-fr">Abonnez-vous</h4>
-                <h4 class="lang-en">Subscribe</h4>
+                <h4 class="lang-ar">تواصل معنا</h4>
+                <h4 class="lang-fr">Contactez-nous</h4>
+                <h4 class="lang-en">Contact Us</h4>
                 
-                <p class="lang-ar">لتصلك آخر العروض</p>
-                <p class="lang-fr">Pour les dernières offres</p>
-                <p class="lang-en">For latest offers</p>
+                <p><i class="fas fa-map-marker-alt"></i> 
+                    <span class="lang-ar">الجزائر العاصمة، حي المرادية</span>
+                    <span class="lang-fr">Alger Centre, Quartier Moradia</span>
+                    <span class="lang-en">Algiers Center, Moradia District</span>
+                </p>
+                
+                <p><i class="fas fa-phone"></i> +213 21 23 45 678</p>
+                
+                <p><i class="fas fa-envelope"></i> info@algeriatouristpass.com</p>
+                
+                <h4 class="lang-ar" style="margin-top: 25px;">النشرة البريدية</h4>
+                <h4 class="lang-fr" style="margin-top: 25px;">Newsletter</h4>
+                <h4 class="lang-en" style="margin-top: 25px;">Newsletter</h4>
                 
                 <div class="newsletter-form">
                     <input type="email" class="lang-ar" placeholder="بريدك الإلكتروني">
@@ -1796,8 +1942,8 @@
                     <button class="btn-login" style="padding: 12px 20px; max-width: 120px;">
                         <i class="fas fa-paper-plane"></i>
                         <span class="lang-ar">اشترك</span>
-                        <span class="lang-fr">Envoyer</span>
-                        <span class="lang-en">Send</span>
+                        <span class="lang-fr">S'inscrire</span>
+                        <span class="lang-en">Subscribe</span>
                     </button>
                 </div>
             </div>
@@ -1885,13 +2031,13 @@
                 
                 let text = '';
                 if(currentLang === 'ar') {
-                    text = `© ${currentYear} Pass Algeria Tourist – جميع الحقوق محفوظة.<br>
+                    text = `© ${currentYear} Algeria Tourist Pass – جميع الحقوق محفوظة.<br>
                     هذه البطاقة شخصية وغير قابلة للتحويل. صالحة للاستعمال السياحي فقط.`;
                 } else if(currentLang === 'fr') {
-                    text = `© ${currentYear} Pass Algeria Tourist – Tous droits réservés.<br>
+                    text = `© ${currentYear} Algeria Tourist Pass – Tous droits réservés.<br>
                     Cette carte est personnelle et non transférable. Valable pour usage touristique uniquement.`;
                 } else {
-                    text = `© ${currentYear} Pass Algeria Tourist – All rights reserved.<br>
+                    text = `© ${currentYear} Algeria Tourist Pass – All rights reserved.<br>
                     This card is personal and non-transferable. Valid for tourist use only.`;
                 }
                 
@@ -1961,7 +2107,6 @@
                 dropdownMenu.classList.toggle('show');
             });
             
-            // عند النقر على أيقونة الحساب: تظهر واجهة تسجيل الدخول مباشرة
             userIcon.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
@@ -1980,7 +2125,6 @@
                 }
             });
             
-            // === زر تسجيل الخروج ===
             logoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const currentLang = document.body.getAttribute('data-lang');
@@ -2055,14 +2199,12 @@
                 }
             });
             
-            // === تسجيل الدخول - أي قيمة مقبولة ===
             document.getElementById('loginFormModal').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const email = document.getElementById('modalEmail').value;
                 const password = document.getElementById('modalPassword').value;
                 
-                // أي قيمة غير فارغة مقبولة
                 if(email && password) {
                     localStorage.setItem('userLoggedIn', 'true');
                     localStorage.setItem('userEmail', email || 'user@example.com');
@@ -2072,7 +2214,6 @@
                     
                     updateLoginState();
                     
-                    // توجيه مباشر إلى index1.html بعد تسجيل الدخول
                     window.location.href = 'index1.html';
                 } else {
                     const currentLang = document.body.getAttribute('data-lang');
@@ -2131,12 +2272,10 @@
                 }
             }
             
-            // التهيئة الأولية - التأكد من أن المستخدم غير مسجل عند تحميل الصفحة
             localStorage.removeItem('userLoggedIn');
             localStorage.removeItem('userEmail');
             updateLoginState();
             
-            // === معالجة نموذج الاتصال ===
             document.getElementById('contactForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -2155,7 +2294,6 @@
                 this.reset();
             });
             
-            // === تأثيرات التمرير ===
             const observer = new IntersectionObserver(function(entries) {
                 entries.forEach(entry => {
                     if(entry.isIntersecting) {
@@ -2172,7 +2310,6 @@
                 observer.observe(el);
             });
             
-            // === تأثيرات إضافية ===
             document.querySelectorAll('button').forEach(btn => {
                 btn.addEventListener('mousedown', function() {
                     this.style.transform = 'scale(0.95)';
@@ -2187,14 +2324,12 @@
                 });
             });
             
-            // تحسينات للهواتف
             if ('ontouchstart' in window) {
                 document.querySelectorAll('button, a').forEach(el => {
                     el.style.tapHighlightColor = 'transparent';
                 });
             }
             
-            // تحديث السنة عند تغيير اللغة
             const langObserver = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if(mutation.attributeName === 'data-lang') {
